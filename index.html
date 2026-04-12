@@ -79,6 +79,7 @@
 
         const StarforceSimulatorV3 = () => {
             const [itemLevel, setItemLevel] = useState(160);
+            const [spareCost, setSpareCost] = useState('100000000');
             const [currentStars, setCurrentStars] = useState(0);
             const [preventDestruction, setPreventDestruction] = useState([]);
             const [selectedEvent, setSelectedEvent] = useState('없음');
@@ -146,6 +147,7 @@
                         }
                     } else if (rand < currentProb.success + currentProb.destroy) {
                         setTotalBooms(prev => prev + 1);
+                        setTotalCost(prev => prev + Number(spareCost)); // 파괴 시 스페어 비용 합산
                         setCurrentStars(12);
                         setLastResult({ type: 'destroy', msg: '장비가 파괴되었습니다!' });
                     } else {
@@ -177,33 +179,30 @@
 
             return (
                 <div className="min-h-screen flex flex-col">
-                    {/* Header/Navigation */}
                     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <i data-lucide="zap" class="w-6 h-6 text-orange-500 fill-orange-500"></i>
-                                <span className="text-xl font-black tracking-tighter text-gray-900">STARFORCE PRO</span>
+                                <span className="text-xl font-black tracking-tighter text-gray-900 uppercase">Starforce Pro</span>
                             </div>
                             <nav className="hidden md:flex gap-8">
                                 <a href="#simulator" className="text-sm font-bold text-gray-600 hover:text-orange-500 transition-colors">시뮬레이터</a>
                                 <a href="#guide" className="text-sm font-bold text-gray-600 hover:text-orange-500 transition-colors">강화 가이드</a>
-                                <a href="#probability" className="text-sm font-bold text-gray-600 hover:text-orange-500 transition-colors">공식 확률표</a>
+                                <a href="https://now.nexon.com/service/maplestory?page=562d346f-f2c9-4425-bb08-12680e165251" target="_blank" className="text-sm font-bold text-gray-600 hover:text-orange-500 transition-colors flex items-center gap-1">공식 확률표 <i data-lucide="external-link" class="w-3 h-3"></i></a>
                             </nav>
                             <div className="flex items-center gap-4">
-                                <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-xs font-black uppercase">KMS NEXT v1.2</span>
+                                <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-xs font-black uppercase">KMS 2025 NEXT</span>
                             </div>
                         </div>
                     </header>
 
-                    {/* Main Simulator Section */}
                     <main id="simulator" className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8 w-full mt-4">
-                        {/* 좌측 패널 */}
                         <div className="flex-1 bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col gap-6">
                             <section className="bg-orange-50 p-6 rounded-2xl border border-orange-100">
                                 <h2 className="text-lg font-black mb-4 flex items-center gap-2 text-orange-800">장비 설정</h2>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-3 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-orange-600 uppercase ml-1">레벨</label>
+                                        <label className="text-[10px] font-black text-orange-600 uppercase ml-1">장비 레벨</label>
                                         <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 font-black text-sm outline-none shadow-sm" value={itemLevel} onChange={(e) => setItemLevel(Number(e.target.value))}>
                                             {[130, 140, 150, 160, 200, 250].map(lv => <option key={lv} value={lv}>{lv}제</option>)}
                                         </select>
@@ -214,6 +213,14 @@
                                             {[...Array(30).keys()].map(s => <option key={s} value={s}>{s}성</option>)}
                                         </select>
                                     </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-orange-600 uppercase ml-1">스페어 비용</label>
+                                        <input type="number" className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 text-right font-black text-sm outline-none shadow-sm" value={spareCost} onChange={(e) => setSpareCost(e.target.value)} />
+                                    </div>
+                                </div>
+                                <div className="mt-3 bg-white/50 p-3 rounded-xl border border-orange-100 text-right">
+                                    <span className="text-[10px] font-black text-orange-400 uppercase mr-2 tracking-widest">Spare Price</span>
+                                    <span className="text-sm font-black text-orange-600 italic underline underline-offset-4 decoration-2 decoration-orange-200">{formatKoreanCurrency(Number(spareCost))}</span>
                                 </div>
                             </section>
 
@@ -253,7 +260,6 @@
                             </div>
                         </div>
 
-                        {/* 우측 패널 (강화창) */}
                         <div className="flex-1 bg-gray-900 p-6 md:p-8 rounded-[2rem] shadow-2xl flex flex-col items-center justify-between text-white relative border-4 border-gray-800">
                             <div className="w-full flex justify-between items-start mb-6">
                                 <div><h2 className="text-2xl font-black italic text-orange-500 tracking-tighter uppercase">ENHANCE</h2><p className="text-[9px] font-bold text-gray-500 tracking-[0.3em]">MAPLE NOW OFFICIAL PROB</p></div>
@@ -301,38 +307,32 @@
                         </div>
                     </main>
 
-                    {/* Information Content Section (Crucial for AdSense) */}
                     <article id="guide" className="max-w-7xl mx-auto px-4 md:px-8 py-16 w-full">
                         <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-gray-100 article-content">
                             <h2 className="text-3xl font-black tracking-tight text-gray-900 mb-8 border-b-4 border-orange-500 inline-block pb-2 italic">Starforce Strategy Guide</h2>
-                            
                             <section>
                                 <h3>1. 메이플스토리 스타포스란 무엇인가요?</h3>
                                 <p>스타포스는 장비의 잠재능력을 한계까지 끌어올리는 메이플스토리의 핵심 강화 시스템입니다. 0성부터 최대 30성까지 강화가 가능하며, 단계가 올라갈수록 아이템의 주력 스탯(STR, DEX, INT, LUK)과 공격력/마력이 비약적으로 상승합니다. 특히 15성 이상의 '고성' 장비는 최상위 보스 레이드를 위한 필수 조건입니다.</p>
                             </section>
-
                             <section>
                                 <h3>2. 2025 KMS NEXT 최신 개편 사항 (하락 삭제)</h3>
-                                <p>메이플스토리의 가장 혁신적인 변화 중 하나는 <strong>15성 이상의 모든 구간에서 실패 시 등급 하락이 완전히 삭제</strong>되었다는 점입니다. 과거에는 실패 시 별이 떨어지는 스트레스로 인해 강화가 매우 고통스러웠으나, 이제는 파괴되지 않는 한 별이 유지되므로 목표 등급까지의 심리적 부담이 크게 줄어들었습니다. 대신 상위 구간의 파괴 확률이 조정되어 스페어 장비의 확보가 더욱 중요해졌습니다.</p>
+                                <p>메이플스토리의 가장 혁신적인 변화 중 하나는 15성 이상의 모든 구간에서 실패 시 등급 하락이 완전히 삭제되었다는 점입니다. 과거에는 실패 시 별이 떨어지는 스트레스로 인해 강화가 매우 고통스러웠으나, 이제는 파괴되지 않는 한 별이 유지되므로 목표 등급까지의 심리적 부담이 크게 줄어들었습니다. 대신 상위 구간의 파괴 확률이 조정되어 스페어 장비의 확보가 더욱 중요해졌습니다.</p>
                             </section>
-
                             <section>
                                 <h3>3. 효율적인 강화 이벤트 활용 전략</h3>
                                 <ul>
-                                    <li><strong>샤이닝 스타포스 타임:</strong> 비용 30% 할인과 5/10/15성 100% 성공이 겹치는 최고의 이벤트입니다. 가장 많은 메소를 아낄 수 있는 시기입니다.</li>
-                                    <li><strong>5, 10, 15성 100% 성공:</strong> 15성에서 16성으로 넘어가는 가장 어려운 구간을 확정적으로 통과할 수 있게 해줍니다.</li>
-                                    <li><strong>1+1 강화 이벤트:</strong> 12성 미만 구간에서 강화 성공 시 2성씩 오르기 때문에 초기 빌드업 비용을 획기적으로 줄여줍니다.</li>
+                                    <li><strong>샤이닝 스타포스 타임:</strong> 비용 30% 할인과 5/10/15성 100% 성공이 겹치는 최고의 이벤트입니다.</li>
+                                    <li><strong>5, 10, 15성 100% 성공:</strong> 15성에서 16성으로 넘어가는 구간을 확정적으로 통과하게 해줍니다.</li>
+                                    <li><strong>1+1 강화 이벤트:</strong> 12성 미만 구간에서 강화 성공 시 2성씩 오릅니다.</li>
                                 </ul>
                             </section>
-
                             <section>
                                 <h3>4. 공식 확률 상세 데이터 (KMS 개편 기준)</h3>
-                                <p>본 시뮬레이터는 '메이플 나우'에서 공개한 공식 확률 테이블을 100% 반영합니다. 22성에서 23성으로 가는 확률은 정확히 15.75%이며, 파괴 확률은 구간별로 정밀하게 설계되어 있습니다. 사용자는 이 시뮬레이터를 통해 실제 강화 전 기대 비용과 파괴 횟수를 미리 예측해볼 수 있습니다.</p>
+                                <p>본 시뮬레이터는 '메이플 나우'에서 공개한 공식 확률 테이블을 100% 반영합니다. 사용자는 이 시뮬레이터를 통해 실제 강화 전 기대 비용과 파괴 횟수를 미리 예측해볼 수 있습니다.</p>
                             </section>
                         </div>
                     </article>
 
-                    {/* Footer (Trust & Policies) */}
                     <footer className="bg-white border-t border-gray-200 py-12 mt-auto">
                         <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
                             <div>
