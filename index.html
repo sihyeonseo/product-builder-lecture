@@ -148,12 +148,8 @@
                         setCurrentStars(12);
                         setLastResult({ type: 'destroy', msg: '장비가 파괴되었습니다!' });
                     } else {
-                        if (currentStars > 10 && currentStars % 5 !== 0) {
-                            setCurrentStars(prev => prev - 1);
-                            setLastResult({ type: 'fail-drop', msg: '강화 실패 (단계 하락)' });
-                        } else {
-                            setLastResult({ type: 'fail-keep', msg: '강화 실패 (단계 유지)' });
-                        }
+                        // 모든 실패는 이제 유지로 처리 (하락 삭제 반영)
+                        setLastResult({ type: 'fail-keep', msg: '강화 실패 (단계 유지)' });
                     }
                     setIsAnimating(false);
                 }, 400);
