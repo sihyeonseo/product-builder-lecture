@@ -236,10 +236,10 @@
                         {/* 2. 세부 설정 */}
                         <div className="flex-1 space-y-6 overflow-y-auto pr-2">
                             <section>
-                                <h3 className="text-sm font-black text-gray-400 mb-3 uppercase tracking-widest">파괴방지 (12-16성)</h3>
-                                <div className="grid grid-cols-5 gap-2">
-                                    {[12, 13, 14, 15, 16].map(s => (
-                                        <button key={s} onClick={() => toggleArray(setPreventDestruction, preventDestruction, s)} className={`py-3 rounded-xl border-2 font-black text-xs transition-all ${preventDestruction.includes(s) ? 'border-orange-500 bg-orange-50 text-orange-500 shadow-sm' : 'border-gray-50 bg-gray-50 text-gray-400 hover:bg-gray-100'}`}>{s}성</button>
+                                <h3 className="text-sm font-black text-gray-400 mb-3 uppercase tracking-widest">파괴방지 (15, 16, 17성)</h3>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[15, 16, 17].map(s => (
+                                        <button key={s} onClick={() => toggleArray(setPreventDestruction, preventDestruction, s)} className={`py-3 rounded-xl border-2 font-black text-xs transition-all ${preventDestruction.includes(s) ? 'border-orange-500 bg-orange-50 text-orange-500 shadow-sm' : 'border-gray-50 bg-gray-50 text-gray-400 hover:bg-gray-100'}`}>{s}성 파방</button>
                                     ))}
                                 </div>
                             </section>
