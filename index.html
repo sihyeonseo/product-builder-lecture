@@ -1,12 +1,206 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>메이플스토리 스타포스 시뮬레이터</title>
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메이플스토리 스타포스 시뮬레이터 Pro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        orange: {
+                            500: '#FF8C00',
+                            600: '#E67E00',
+                            50: '#FFF7ED',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- React & Babel CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+        body { font-family: "Pretendard", sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const StarforceSimulator = () => {
+            const [preventDestruction, setPreventDestruction] = useState([]);
+            const [traceRecovery, setTraceRecovery] = useState([]);
+            const [traceOpt, setTraceOpt] = useState(false);
+            const [selectedEvent, setSelectedEvent] = useState('없음');
+            const [discounts, setDiscounts] = useState({
+                silver: false, gold: false, diamond: false, pc: false
+            });
+
+            const events = [
+                "없음", "10성 이하에서 강화 시 1+1", "비용 30% 할인 (샤타포스)",
+                "흔적 복구 비용 중 메소 비용 20% 할인", "5, 10, 15성에서 강화 시 성공확률 100%",
+                "21성 이하에서 파괴 확률 30% 감소 (샤타포스)", "샤이닝 스타포스",
+                "샤이닝 스타포스 (+흔적 복구 비용 20% 할인)", "샤이닝 스타포스 (+ 5/10/15성 100%)"
+            ];
+
+            const toggleArray = (setter, state, value) => {
+                if (state.includes(value)) setter(state.filter(v => v !== value));
+                else setter([...state, value]);
+            };
+
+            const toggleAll = (type) => {
+                if (type === 'prevent') setPreventDestruction([15, 16, 17]);
+                else setTraceRecovery([15, 16, 17, 18, 19, 20, 21, 22]);
+            };
+
+            const toggleDiscount = (key) => {
+                setDiscounts(prev => ({ ...prev, [key]: !prev[key] }));
+            };
+
+            // Lucide 아이콘 렌더링을 위한 효과
+            useEffect(() => {
+                lucide.createIcons();
+            }, []);
+
+            return (
+                <div className="min-h-screen flex items-center justify-center p-4 md:p-8">
+                    <div className="max-w-7xl w-full flex flex-col md:flex-row gap-6">
+                        
+                        {/* 좌측 패널 */}
+                        <div className="flex-1 bg-white p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 space-y-10">
+                            
+                            <section>
+                                <div className="flex items-center gap-4 mb-5">
+                                    <h2 className="text-xl font-black tracking-tight text-gray-900">파괴방지</h2>
+                                    <button onClick={() => toggleAll('prevent')} className="text-orange-500 text-sm font-bold hover:underline">모두 선택</button>
+                                </div>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {[15, 16, 17].map(star => (
+                                        <button 
+                                            key={star}
+                                            onClick={() => toggleArray(setPreventDestruction, preventDestruction, star)}
+                                            className={`py-4 rounded-2xl border-2 font-bold transition-all ${
+                                                preventDestruction.includes(star) 
+                                                    ? 'border-orange-500 text-orange-500 bg-orange-50' 
+                                                    : 'border-gray-50 text-gray-400 bg-gray-50 hover:bg-gray-100'
+                                            }`}
+                                        >
+                                            {star}성
+                                        </button>
+                                    ))}
+                                </div>
+                            </section>
+
+                            <section>
+                                <div className="flex items-center justify-between mb-5">
+                                    <div className="flex items-center gap-4">
+                                        <h2 className="text-xl font-black tracking-tight text-gray-900">흔적 복구</h2>
+                                        <button onClick={() => toggleAll('trace')} className="text-orange-500 text-sm font-bold hover:underline">모두 선택</button>
+                                    </div>
+                                    <a href="#" className="text-orange-500 text-sm font-bold flex items-center gap-1">
+                                        데이터 출처 <i data-lucide="external-link" class="w-3 h-3"></i>
+                                    </a>
+                                </div>
+                                
+                                <label className="flex items-center gap-3 mb-5 cursor-pointer group">
+                                    <div className="relative">
+                                        <input type="checkbox" className="sr-only peer" checked={traceOpt} onChange={() => setTraceOpt(!traceOpt)} />
+                                        <div className="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-orange-500 transition-all after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>
+                                    </div>
+                                    <span className="text-sm font-bold text-gray-600 group-hover:text-gray-900">흔적 복구 최적화</span>
+                                </label>
+
+                                <div className="grid grid-cols-4 gap-3">
+                                    {[15, 16, 17, 18, 19, 20, 21, 22].map(star => (
+                                        <button 
+                                            key={star}
+                                            onClick={() => toggleArray(setTraceRecovery, traceRecovery, star)}
+                                            className={`py-4 rounded-2xl border-2 font-bold transition-all ${
+                                                traceRecovery.includes(star) 
+                                                    ? 'border-orange-500 text-orange-500 bg-orange-50' 
+                                                    : 'border-gray-50 text-gray-400 bg-gray-50 hover:bg-gray-100'
+                                            }`}
+                                        >
+                                            {star}성
+                                        </button>
+                                    ))}
+                                </div>
+                            </section>
+
+                            <section>
+                                <h2 className="text-xl font-black mb-5 text-gray-900">스타포스 이벤트</h2>
+                                <div className="space-y-2">
+                                    {events.map((event, idx) => (
+                                        <label key={idx} className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all ${selectedEvent === event ? 'border-orange-500 bg-orange-50' : 'border-gray-50 bg-gray-50 hover:border-gray-200'}`}>
+                                            <input type="radio" name="event" className="w-4 h-4 accent-orange-500" checked={selectedEvent === event} onChange={() => setSelectedEvent(event)} />
+                                            <span className={`text-sm font-bold ${selectedEvent === event ? 'text-orange-600' : 'text-gray-600'}`}>{event}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </section>
+
+                            <section>
+                                <h2 className="text-xl font-black mb-5 text-gray-900">강화비용 할인</h2>
+                                <div className="flex flex-wrap gap-3">
+                                    {['MVP 실버', 'MVP 골드', 'MVP 다이아', 'PC방'].map(d => (
+                                        <label key={d} className="flex items-center gap-2 px-5 py-3 rounded-full border-2 border-gray-100 bg-white font-bold text-sm text-gray-500 cursor-pointer hover:border-orange-200 transition-all">
+                                            <input type="checkbox" className="w-4 h-4 accent-orange-500" />
+                                            {d}
+                                        </label>
+                                    ))}
+                                </div>
+                            </section>
+                        </div>
+
+                        {/* 우측 패널 */}
+                        <div className="flex-1 bg-white p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col min-h-[700px]">
+                            <div className="flex items-center justify-between mb-8">
+                                <h2 className="text-2xl font-black text-gray-900">시뮬레이션 통계</h2>
+                                <span className="bg-orange-100 text-orange-600 px-4 py-1.5 rounded-full text-sm font-black">평균: 0</span>
+                            </div>
+
+                            <div className="flex items-center gap-3 mb-10">
+                                <div className="flex-1 relative">
+                                    <input type="text" className="w-full bg-gray-50 border-none rounded-2xl py-5 px-6 text-right font-black text-xl focus:ring-2 focus:ring-orange-500 outline-none" placeholder="0" />
+                                    <span className="absolute left-6 top-5 font-black text-gray-900">상위</span>
+                                    <span className="absolute right-6 top-5 font-bold text-gray-400">%</span>
+                                </div>
+                                <div className="text-gray-300"><i data-lucide="arrow-left-right"></i></div>
+                                <div className="flex-1 relative">
+                                    <input type="text" className="w-full bg-gray-50 border-none rounded-2xl py-5 px-6 text-right font-black text-xl focus:ring-2 focus:ring-orange-500 outline-none" placeholder="0" />
+                                    <span className="absolute right-6 top-5 font-bold text-gray-400">메소</span>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 border-4 border-dashed border-gray-50 rounded-[2rem] bg-gray-50/30 flex flex-col items-center justify-center p-10 text-center">
+                                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-5 text-gray-200">
+                                    <i data-lucide="bar-chart-3" class="w-8 h-8"></i>
+                                </div>
+                                <p className="font-bold text-gray-400">시뮬레이션 결과가 여기에 표시됩니다.</p>
+                            </div>
+
+                            <button className="mt-8 w-full py-6 bg-orange-500 text-white rounded-[1.5rem] text-xl font-black shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-[0.98] transition-all">
+                                시뮬레이션 시작
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<StarforceSimulator />);
+    </script>
+</body>
 </html>
