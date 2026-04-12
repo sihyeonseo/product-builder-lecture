@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Product Builder Portfolio</title>
+  <title>메이플스토리 스타포스 시뮬레이터 & 강화 가이드</title>
+  <meta name="description" content="메이플스토리 스타포스 강화 확률을 미리 체험하고 누적 비용을 계산해보세요. 25성까지의 성공 확률과 파괴 방지 전략을 제공합니다.">
   <link href='/style.css' rel='stylesheet'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <meta name="google-adsense-account" content="ca-pub-4639776942447769">
@@ -11,61 +12,101 @@
      crossorigin="anonymous"></script>
 </head>
 <body>
-  <div class="hero">
-    <div class="hero-content">
-      <div class="profile-img">🚀</div>
-      <h1>Product Builder</h1>
-      <p class="subtitle">아이디어를 현실로 만드는 가치를 창조합니다.</p>
-      <div class="cta-buttons">
-        <button id="btn-contact" class="btn primary"><i class="fas fa-envelope"></i> 제휴 문의하기</button>
-        <button id="btn-comments" class="btn secondary"><i class="fas fa-comments"></i> 피드백 남기기</button>
+  <header>
+    <nav class="container">
+      <div class="logo">MapleStarForce</div>
+      <ul>
+        <li><a href="#simulator">시뮬레이터</a></li>
+        <li><a href="#guide">강화 가이드</a></li>
+        <li><a href="#probability">확률표</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="simulator" class="card">
+      <h2><i class="fas fa-hammer"></i> 스타포스 시뮬레이터</h2>
+      <div class="sim-wrapper">
+        <div class="item-display">
+          <div class="item-icon">⚔️</div>
+          <div class="item-info">
+            <span id="item-name">앱솔랩스 무기 (160제)</span>
+            <div class="star-rating" id="star-display"></div>
+          </div>
+        </div>
+        
+        <div class="controls">
+          <div class="option-group">
+            <label><input type="checkbox" id="star-catch" checked> 스타캐치 해제</label>
+            <label><input type="checkbox" id="safeguard"> 파괴 방지 (12~16성)</label>
+          </div>
+          <div class="stats-box">
+            <p>현재 단계: <span id="current-stars">0</span>성</p>
+            <p>성공 확률: <span id="success-rate">100</span>%</p>
+            <p>실패(유지): <span id="keep-rate">0</span>%</p>
+            <p>실패(하락): <span id="drop-rate">0</span>%</p>
+            <p>파괴 확률: <span id="destroy-rate">0</span>%</p>
+          </div>
+          <div class="cost-box">
+            <p>강화 비용: <span id="upgrade-cost">0</span> 메조</p>
+            <p>누적 비용: <span id="total-cost">0</span> 메조</p>
+          </div>
+          <button id="btn-upgrade" class="btn-primary">강화하기</button>
+          <button id="btn-reset" class="btn-secondary">초기화</button>
+        </div>
+
+        <div class="log-box" id="upgrade-log">
+          <p class="log-entry">강화를 시작하세요!</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="guide" class="card">
+      <h2><i class="fas fa-book"></i> 스타포스 강화 완벽 가이드</h2>
+      <div class="content">
+        <h3>1. 스타포스란?</h3>
+        <p>메이플스토리에서 장비의 성능을 비약적으로 상승시키는 핵심 강화 시스템입니다. 0성부터 최대 25성까지 가능하며, 일정 단계 이상부터는 실패 시 등급 하락이나 장비 파괴의 위험이 따릅니다.</p>
+        
+        <h3>2. 효율적인 강화 전략</h3>
+        <ul>
+          <li><strong>15성 100% 이벤트:</strong> 비용 절감을 위해 이벤트 기간을 활용하는 것이 가장 중요합니다.</li>
+          <li><strong>파괴 방지 사용:</strong> 12성부터 16성 구간에서는 파괴 방지 옵션을 사용하여 소중한 장비를 보호하세요.</li>
+          <li><strong>스타캐치:</strong> 미니게임을 성공하면 성공 확률이 기본 확률의 5%만큼 곱연산으로 증가합니다.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="probability" class="card">
+      <h2><i class="fas fa-chart-pie"></i> 스타포스 단계별 확률표</h2>
+      <table class="prob-table">
+        <thead>
+          <tr>
+            <th>구간</th>
+            <th>성공</th>
+            <th>유지</th>
+            <th>하락</th>
+            <th>파괴</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0-10성</td><td>100~45%</td><td>0~55%</td><td>0%</td><td>0%</td></tr>
+          <tr><td>11-15성</td><td>45~30%</td><td>0%</td><td>55~70%</td><td>0~2%</td></tr>
+          <tr><td>16-25성</td><td>30%</td><td>0%</td><td>67~70%</td><td>3~10%</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 MapleStarForce Simulator. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="/privacy.html">개인정보 처리방침</a>
+        <a href="https://github.com/sihyeonseo/product-builder-lecture">GitHub Repository</a>
       </div>
     </div>
-  </div>
-
-  <div id="section-contact" class="content-section hidden">
-    <div class="container">
-      <button class="close-btn">&times;</button>
-      <h2><i class="fas fa-paper-plane"></i> 제휴 문의</h2>
-      <form action="https://formspree.io/f/xbdqrjyp" method="POST">
-        <div class="form-group">
-          <label for="name">성함/업체명</label>
-          <input type="text" id="name" name="name" required placeholder="성함 또는 업체명을 입력해주세요.">
-        </div>
-        <div class="form-group">
-          <label for="email">이메일 주소</label>
-          <input type="email" id="email" name="_replyto" required placeholder="example@email.com">
-        </div>
-        <div class="form-group">
-          <label for="message">문의 내용</label>
-          <textarea id="message" name="message" required placeholder="문의하실 내용을 입력해주세요."></textarea>
-        </div>
-        <button type="submit" class="submit-btn">보내기</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="section-comments" class="content-section hidden">
-    <div class="container">
-      <button class="close-btn">&times;</button>
-      <h2><i class="fas fa-comment-dots"></i> 커뮤니티 피드백</h2>
-      <div id="disqus_thread"></div>
-      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    </div>
-  </div>
+  </footer>
 
   <script src="/main.js"></script>
-  <script>
-    var disqus_config = function () {
-      this.page.url = window.location.href;
-      this.page.identifier = 'product-builder-portfolio';
-    };
-    (function() {
-      var d = document, s = d.createElement('script');
-      s.src = 'https://product-builder-ugjah1jgki.disqus.com/embed.js';
-      s.setAttribute('data-timestamp', +new Date());
-      (d.head || d.body).appendChild(s);
-    })();
-  </script>
 </body>
 </html>
