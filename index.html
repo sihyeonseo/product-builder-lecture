@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 메이플 스타포스 Pro V3.5 - 공식 확률 완벽 고증</title>
+    <title>2025 메이플 스타포스 Pro V3.6 - AdSense 통합판</title>
+    <!-- Google AdSense -->
+    <meta name="google-adsense-account" content="ca-pub-4639776942447769">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4639776942447769"
+     crossorigin="anonymous"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -46,53 +51,28 @@
             return result.trim() + ' 메소';
         };
 
-        // 공식 확률 테이블 [그룹 1: 기본]
         const BASE_PROB_TABLE = [
-            { s: 99.75, k: 0.25, b: 0 }, // 0
-            { s: 94.50, k: 5.50, b: 0 }, // 1
-            { s: 89.25, k: 10.75, b: 0 }, // 2
-            { s: 89.25, k: 10.75, b: 0 }, // 3
-            { s: 84.00, k: 16.00, b: 0 }, // 4
-            { s: 78.75, k: 21.25, b: 0 }, // 5
-            { s: 73.50, k: 26.50, b: 0 }, // 6
-            { s: 68.25, k: 31.75, b: 0 }, // 7
-            { s: 63.00, k: 37.00, b: 0 }, // 8
-            { s: 57.75, k: 42.25, b: 0 }, // 9
-            { s: 52.50, k: 47.50, b: 0 }, // 10
-            { s: 47.25, k: 52.75, b: 0 }, // 11
-            { s: 42.00, k: 58.00, b: 0 }, // 12
-            { s: 36.75, k: 63.25, b: 0 }, // 13
-            { s: 31.50, k: 68.50, b: 0 }, // 14
-            { s: 31.50, k: 66.445, b: 2.055 }, // 15
-            { s: 31.50, k: 66.445, b: 2.055 }, // 16
-            { s: 15.75, k: 77.51, b: 6.74 }, // 17
-            { s: 15.75, k: 77.51, b: 6.74 }, // 18
-            { s: 15.75, k: 75.825, b: 8.425 }, // 19
-            { s: 31.50, k: 58.225, b: 10.275 }, // 20
-            { s: 15.75, k: 71.6125, b: 12.6375 }, // 21
-            { s: 15.75, k: 67.40, b: 16.85 }, // 22
-            { s: 10.50, k: 71.60, b: 17.90 }, // 23
-            { s: 10.50, k: 71.60, b: 17.90 }, // 24
-            { s: 10.50, k: 71.60, b: 17.90 }, // 25
-            { s: 7.35, k: 74.12, b: 18.53 }, // 26
-            { s: 5.25, k: 75.80, b: 18.95 }, // 27
-            { s: 3.15, k: 77.48, b: 19.37 }, // 28
-            { s: 1.05, k: 79.16, b: 19.79 }, // 29
+            { s: 99.75, k: 0.25, b: 0 }, { s: 94.50, k: 5.50, b: 0 }, { s: 89.25, k: 10.75, b: 0 },
+            { s: 89.25, k: 10.75, b: 0 }, { s: 84.00, k: 16.00, b: 0 }, { s: 78.75, k: 21.25, b: 0 },
+            { s: 73.50, k: 26.50, b: 0 }, { s: 68.25, k: 31.75, b: 0 }, { s: 63.00, k: 37.00, b: 0 },
+            { s: 57.75, k: 42.25, b: 0 }, { s: 52.50, k: 47.50, b: 0 }, { s: 47.25, k: 52.75, b: 0 },
+            { s: 42.00, k: 58.00, b: 0 }, { s: 36.75, k: 63.25, b: 0 }, { s: 31.50, k: 68.50, b: 0 },
+            { s: 31.50, k: 66.445, b: 2.055 }, { s: 31.50, k: 66.445, b: 2.055 }, { s: 15.75, k: 77.51, b: 6.74 },
+            { s: 15.75, k: 77.51, b: 6.74 }, { s: 15.75, k: 75.825, b: 8.425 }, { s: 31.50, k: 58.225, b: 10.275 },
+            { s: 15.75, k: 71.6125, b: 12.6375 }, { s: 15.75, k: 67.40, b: 16.85 }, { s: 10.50, k: 71.60, b: 17.90 },
+            { s: 10.50, k: 71.60, b: 17.90 }, { s: 10.50, k: 71.60, b: 17.90 }, { s: 7.35, k: 74.12, b: 18.53 },
+            { s: 5.25, k: 75.80, b: 18.95 }, { s: 3.15, k: 77.48, b: 19.37 }, { s: 1.05, k: 79.16, b: 19.79 },
         ];
 
         const GROUP3_REDUCED_BOOM = {
-            15: { s: 31.50, k: 67.0615, b: 1.4385 },
-            16: { s: 31.50, k: 67.0615, b: 1.4385 },
-            17: { s: 15.75, k: 79.532, b: 4.718 },
-            18: { s: 15.75, k: 79.532, b: 4.718 },
-            19: { s: 15.75, k: 78.3525, b: 5.8975 },
-            20: { s: 31.50, k: 61.3075, b: 7.1925 },
+            15: { s: 31.50, k: 67.0615, b: 1.4385 }, 16: { s: 31.50, k: 67.0615, b: 1.4385 },
+            17: { s: 15.75, k: 79.532, b: 4.718 }, 18: { s: 15.75, k: 79.532, b: 4.718 },
+            19: { s: 15.75, k: 78.3525, b: 5.8975 }, 20: { s: 31.50, k: 61.3075, b: 7.1925 },
             21: { s: 15.75, k: 75.4038, b: 8.8463 },
         };
 
         const StarforceSimulatorV3 = () => {
             const [itemLevel, setItemLevel] = useState(160);
-            const [spareCost, setSpareCost] = useState('100000000');
             const [currentStars, setCurrentStars] = useState(0);
             const [preventDestruction, setPreventDestruction] = useState([]);
             const [selectedEvent, setSelectedEvent] = useState('없음');
@@ -104,34 +84,20 @@
             const [lastResult, setLastResult] = useState({ type: '', msg: '강화 준비 완료' });
             const [isAnimating, setIsAnimating] = useState(false);
 
-            // 1. 실시간 확률 보정 계산
             const currentProb = useMemo(() => {
                 let prob = { ...BASE_PROB_TABLE[currentStars] };
-
-                // [그룹 2] 5, 10, 15성 100% 성공
                 if ((selectedEvent === "5/10/15성 100%" || selectedEvent === "샤이닝 스타포스") && [5, 10, 15].includes(currentStars)) {
                     prob = { s: 100.00, k: 0.00, b: 0.00 };
                 }
-
-                // [그룹 3] 파괴 확률 30% 감소 (15~21성)
                 if ((selectedEvent === "21성 이하 파괴확률 30% 감소" || selectedEvent === "샤이닝 스타포스") && currentStars >= 15 && currentStars <= 21) {
                     prob = { ...GROUP3_REDUCED_BOOM[currentStars] };
                 }
-
-                // 파괴 방지 적용 (파괴 확률 -> 유지 확률로 이전)
                 if (preventDestruction.includes(currentStars)) {
-                    prob.k += prob.b;
-                    prob.b = 0;
+                    prob.k += prob.b; prob.b = 0;
                 }
-
-                return {
-                    success: prob.s,
-                    destroy: prob.b,
-                    fail: prob.k
-                };
+                return { success: prob.s, destroy: prob.b, fail: prob.k };
             }, [currentStars, preventDestruction, selectedEvent]);
 
-            // 2. 비용 계산
             const costData = useMemo(() => {
                 let D = 200;
                 if (currentStars < 10) D = 1000;
@@ -142,23 +108,18 @@
                     else if (currentStars === 19) D = 45;
                     else if (currentStars === 21) D = 125;
                 }
-
                 const baseCost = 1000 + Math.pow(itemLevel, 3) * Math.pow(currentStars + 1, 2.7) / D;
-                
                 let discountRate = 0;
                 if (selectedEvent === "비용 30% 할인" || selectedEvent === "샤이닝 스타포스") discountRate += 0.30;
                 if (discounts.silver) discountRate += 0.03;
                 if (discounts.gold) discountRate += 0.05;
                 if (discounts.diamond) discountRate += 0.10;
                 if (discounts.pc) discountRate += 0.05;
-
                 const actualCost = baseCost * (1 - Math.min(discountRate, 0.5));
                 const safeguardCost = preventDestruction.includes(currentStars) ? actualCost : 0;
-                
                 return {
                     total: Math.round((actualCost + safeguardCost) / 100) * 100,
-                    saved: Math.round((baseCost - actualCost) / 100) * 100,
-                    base: Math.round(baseCost / 100) * 100
+                    saved: Math.round((baseCost - actualCost) / 100) * 100
                 };
             }, [currentStars, itemLevel, selectedEvent, discounts, preventDestruction]);
 
@@ -167,11 +128,9 @@
                 setTotalCost(prev => prev + costData.total);
                 setTotalAttempts(prev => prev + 1);
                 setIsAnimating(true);
-
                 setTimeout(() => {
                     const rand = Math.random() * 100;
                     if (rand < currentProb.success) {
-                        // 1+1 이벤트 처리
                         if (selectedEvent === "10성 이하 1+1" && currentStars < 10) {
                             setCurrentStars(prev => Math.min(prev + 2, 12));
                             setLastResult({ type: 'success', msg: '강화 성공! (1+1 발동)' });
@@ -181,11 +140,9 @@
                         }
                     } else if (rand < currentProb.success + currentProb.destroy) {
                         setTotalBooms(prev => prev + 1);
-                        setTotalCost(prev => prev + Number(spareCost));
                         setCurrentStars(12);
                         setLastResult({ type: 'destroy', msg: '장비가 파괴되었습니다!' });
                     } else {
-                        // 모든 실패는 '유지' (하락 없음 고증)
                         setLastResult({ type: 'fail-keep', msg: '강화 실패 (단계 유지)' });
                     }
                     setIsAnimating(false);
@@ -196,8 +153,6 @@
                 setTotalCost(0); setTotalBooms(0); setTotalAttempts(0);
                 setLastResult({ type: '', msg: '초기화되었습니다' });
             };
-
-            useEffect(() => lucide.createIcons(), [lastResult, currentStars, selectedEvent, discounts, preventDestruction]);
 
             const StarRow = ({ start }) => (
                 <div className="flex gap-3 justify-center mb-2">
@@ -212,32 +167,26 @@
                 </div>
             );
 
+            useEffect(() => lucide.createIcons(), [lastResult, currentStars, selectedEvent, discounts, preventDestruction]);
+
             return (
                 <div className="max-w-7xl mx-auto p-4 md:p-8 min-h-screen flex flex-col md:flex-row gap-6">
-                    {/* 좌측 패널 */}
                     <div className="flex-1 bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col gap-6">
                         <section className="bg-orange-50 p-6 rounded-2xl border border-orange-100">
                             <h2 className="text-lg font-black mb-4 flex items-center gap-2 text-orange-800">장비 설정</h2>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-orange-600 uppercase ml-1">레벨</label>
-                                    <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 font-black text-sm outline-none" value={itemLevel} onChange={(e) => setItemLevel(Number(e.target.value))}>
+                                    <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 font-black text-sm outline-none shadow-sm" value={itemLevel} onChange={(e) => setItemLevel(Number(e.target.value))}>
                                         {[130, 140, 150, 160, 200, 250].map(lv => <option key={lv} value={lv}>{lv}제</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-orange-600 uppercase ml-1">스페어</label>
-                                    <input type="number" className="w-full bg-white border border-orange-200 rounded-xl py-3 px-3 text-right font-black text-sm outline-none" value={spareCost} onChange={(e) => setSpareCost(e.target.value)} />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-orange-600 uppercase ml-1">시작</label>
-                                    <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 font-black text-sm outline-none" value={currentStars} onChange={(e) => setCurrentStars(Number(e.target.value))} disabled={totalAttempts > 0}>
+                                    <label className="text-[10px] font-black text-orange-600 uppercase ml-1">시작 단계</label>
+                                    <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 font-black text-sm outline-none shadow-sm" value={currentStars} onChange={(e) => setCurrentStars(Number(e.target.value))} disabled={totalAttempts > 0}>
                                         {[...Array(30).keys()].map(s => <option key={s} value={s}>{s}성</option>)}
                                     </select>
                                 </div>
-                            </div>
-                            <div className="mt-3 bg-white/50 p-3 rounded-xl border border-orange-100 text-right">
-                                <span className="text-sm font-black text-orange-600 italic underline underline-offset-4 decoration-2 decoration-orange-200">{formatKoreanCurrency(Number(spareCost))}</span>
                             </div>
                         </section>
 
@@ -277,7 +226,6 @@
                         </div>
                     </div>
 
-                    {/* 우측 패널 */}
                     <div className="flex-1 bg-gray-900 p-6 md:p-8 rounded-[2rem] shadow-2xl flex flex-col items-center justify-between text-white relative">
                         <div className="w-full flex justify-between items-start mb-6">
                             <div><h2 className="text-2xl font-black italic text-orange-500 tracking-tighter uppercase">ENHANCE</h2><p className="text-[9px] font-bold text-gray-500 tracking-[0.3em]">MAPLE NOW OFFICIAL PROB</p></div>
@@ -295,11 +243,11 @@
                             <div className="text-center space-y-4 w-full">
                                 <p className={`text-xl font-black px-10 py-3 rounded-full border-2 ${lastResult.type === 'success' ? 'border-green-500 text-green-500 bg-green-500/10 shadow-[0_0_20px_rgba(34,197,94,0.3)]' : lastResult.type === 'destroy' ? 'border-red-600 text-red-600 bg-red-600/10' : 'border-gray-500 text-gray-400 bg-gray-500/10'}`}>{lastResult.msg}</p>
                                 <div className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 flex gap-6 text-[10px] font-black uppercase tracking-widest shadow-inner justify-center">
-                                    <div className="flex flex-col"><span className="text-gray-500 mb-1">Success</span><span className="text-green-500 text-sm">{currentProb.success.toFixed(2)}%</span></div>
+                                    <div className="flex flex-col"><span className="text-gray-500 mb-1 font-sans">Success</span><span className="text-green-500 text-sm">{currentProb.success.toFixed(2)}%</span></div>
                                     <div className="w-[1px] bg-white/10"></div>
-                                    <div className="flex flex-col"><span className="text-gray-500 mb-1">Keep</span><span className="text-gray-300 text-sm">{currentProb.fail.toFixed(2)}%</span></div>
+                                    <div className="flex flex-col"><span className="text-gray-500 mb-1 font-sans">Keep</span><span className="text-gray-300 text-sm">{currentProb.fail.toFixed(2)}%</span></div>
                                     <div className="w-[1px] bg-white/10"></div>
-                                    <div className="flex flex-col"><span className="text-gray-500 mb-1">Boom</span><span className="text-red-500 text-sm">{currentProb.destroy.toFixed(2)}%</span></div>
+                                    <div className="flex flex-col"><span className="text-gray-500 mb-1 font-sans">Boom</span><span className="text-red-500 text-sm">{currentProb.destroy.toFixed(2)}%</span></div>
                                 </div>
                                 <div className="flex gap-3">
                                     <button className="flex-1 bg-white/10 text-gray-400 font-black py-4 rounded-xl hover:bg-white/20 transition-all border border-white/5" onClick={resetAll}>초기화</button>
