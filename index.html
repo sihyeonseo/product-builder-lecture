@@ -63,12 +63,11 @@
             const [spareCost, setSpareCost] = useState('');
             
             const [preventDestruction, setPreventDestruction] = useState([]);
-            const [traceRecovery, setTraceRecovery] = useState([]);
-            const [traceOpt, setTraceOpt] = useState(false);
             const [selectedEvent, setSelectedEvent] = useState('없음');
-            const [discounts, setDiscounts] = useState({
-                silver: false, gold: false, diamond: false, pc: false
-            });
+            
+            // 시뮬레이션 결과 상태
+            const [simResult, setSimResult] = useState(null);
+            const [isSimulating, setIsSimulating] = useState(false);
 
             const events = [
                 "없음", "10성 이하에서 강화 시 1+1", "비용 30% 할인 (샤타포스)",
@@ -86,9 +85,70 @@
                 else setter([...state, value]);
             };
 
+            // 시뮬레이션 실행 로직
+            const handleSimulate = () => {
+                if (!selectedItem) {
+                    alert("먼저 강화할 장비를 선택해주세요!");
+                    return;
+                }
+
+                setIsSimulating(true);
+                setSimResult(null);
+
+                // 연출을 위한 약간의 지연 (선택 사항)
+                setTimeout(() => {
+                    let currentStar = startStarforce;
+                    const targetStar = startStarforce + 1;
+                    
+                    let totalCost = 0;
+                    let totalBooms = 0;
+                    let attempts = 0;
+                    const spareCostNum = Number(spareCost) || 0;
+
+                    // 목표 별에 도달할 때까지 무한 반복
+                    while (currentStar < targetStar) {
+                        attempts++;
+                        
+                        // 1. 강화 비용 계산 (임시 공식)
+                        const currentCost = Math.floor(Math.pow(selectedItem.level, 3) * Math.pow(currentStar + 1, 2) / 500);
+                        totalCost += currentCost;
+
+                        // 2. 파괴 방지 체크
+                        const isPrevented = preventDestruction.includes(currentStar);
+                        if (isPrevented) {
+                            totalCost += currentCost; 
+                        }
+
+                        // 3. 확률 계산 (임시 확률)
+                        const rand = Math.random();
+                        let successRate = 0.30; 
+                        let destroyRate = isPrevented ? 0 : 0.02; 
+
+                        if (rand < successRate) {
+                            currentStar++;
+                        } else if (rand < successRate + destroyRate) {
+                            totalBooms++;
+                            currentStar = 12; 
+                            totalCost += spareCostNum; 
+                        } else {
+                            // 실패 유지 (하락 로직 생략)
+                        }
+
+                        if (attempts > 100000) break; 
+                    }
+
+                    setSimResult({
+                        cost: totalCost,
+                        booms: totalBooms,
+                        attempts: attempts
+                    });
+                    setIsSimulating(false);
+                }, 100);
+            };
+
             useEffect(() => {
                 lucide.createIcons();
-            }, [selectedItem, searchQuery]);
+            }, [selectedItem, searchQuery, simResult, isSimulating]);
 
             return (
                 <div className="max-w-7xl mx-auto p-4 md:p-10 min-h-screen flex flex-col md:flex-row gap-8">
@@ -96,20 +156,19 @@
                     {/* 좌측 패널 */}
                     <div className="flex-1 bg-white p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col gap-8">
                         
-                        {/* 1. 장비 검색 */}
                         <section>
-                            <h2 className="text-xl font-black mb-4 flex items-center gap-2">
+                            <h2 className="text-xl font-black mb-4 flex items-center gap-2 text-gray-900">
                                 <i data-lucide="search" class="w-5 h-5 text-orange-500"></i> 장비 검색
                             </h2>
                             <div className="relative">
                                 <input 
                                     type="text" 
-                                    placeholder="장비 이름을 입력하세요 (예: 에테르넬)"
+                                    placeholder="장비 이름을 입력하세요"
                                     className="w-full bg-gray-50 border-2 border-transparent rounded-2xl py-4 px-5 pl-12 outline-none focus:border-orange-500 focus:bg-white transition-all font-bold"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
-                                <div className="absolute left-4 top-4.5 text-gray-400">
+                                <div className="absolute left-4 top-4 text-gray-400">
                                     <i data-lucide="search" class="w-5 h-5"></i>
                                 </div>
                             </div>
@@ -130,23 +189,21 @@
                             )}
                         </section>
 
-                        {/* 2. 장비 설정 */}
                         <section className="bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100">
                             <h2 className="text-lg font-black mb-4 text-gray-800">선택된 장비 설정</h2>
-                            
-                            <div className="bg-white border border-orange-100 rounded-2xl p-5 mb-6 flex items-center gap-4 shadow-sm">
+                            <div className="bg-white border border-orange-100 rounded-2xl p-5 mb-6 flex items-center gap-4 shadow-sm transition-all">
                                 <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-100">
                                     <i data-lucide="shield-check" class="w-8 h-8"></i>
                                 </div>
                                 <div>
                                     <p className="font-black text-gray-900 text-lg">{selectedItem.name}</p>
-                                    <p className="text-sm text-orange-600 font-bold tracking-wide">REQUIRED LEVEL: {selectedItem.level}</p>
+                                    <p className="text-sm text-orange-600 font-bold tracking-wide uppercase">Lv.{selectedItem.level} 장비</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-gray-400 uppercase ml-1">스페어 비용</label>
+                                    <label className="text-xs font-black text-gray-400 uppercase ml-1 tracking-widest">스페어 비용</label>
                                     <div className="relative">
                                         <input 
                                             type="number" 
@@ -159,9 +216,9 @@
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-gray-400 uppercase ml-1">시작 스타포스</label>
+                                    <label className="text-xs font-black text-gray-400 uppercase ml-1 tracking-widest">시작 스타포스</label>
                                     <select 
-                                        className="w-full bg-white border-2 border-transparent rounded-xl py-3 px-4 font-black outline-none focus:border-orange-500 transition-all shadow-sm appearance-none cursor-pointer"
+                                        className="w-full bg-white border-2 border-transparent rounded-xl py-3 px-4 font-black outline-none focus:border-orange-500 transition-all shadow-sm cursor-pointer appearance-none"
                                         value={startStarforce}
                                         onChange={(e) => setStartStarforce(Number(e.target.value))}
                                     >
@@ -173,9 +230,8 @@
                             </div>
                         </section>
 
-                        {/* 3. 세부 설정 */}
-                        <div className="space-y-8">
-                            <section>
+                        <section className="space-y-6">
+                            <div>
                                 <h3 className="text-sm font-black text-gray-400 mb-4 uppercase tracking-widest">파괴방지 설정</h3>
                                 <div className="grid grid-cols-3 gap-3">
                                     {[15, 16, 17].map(star => (
@@ -184,7 +240,7 @@
                                             onClick={() => toggleArray(setPreventDestruction, preventDestruction, star)}
                                             className={`py-4 rounded-2xl border-2 font-black transition-all ${
                                                 preventDestruction.includes(star) 
-                                                    ? 'border-orange-500 text-orange-500 bg-orange-50 shadow-lg shadow-orange-50' 
+                                                    ? 'border-orange-500 text-orange-500 bg-orange-50 shadow-lg shadow-orange-100' 
                                                     : 'border-gray-50 bg-gray-50 text-gray-400 hover:bg-gray-100'
                                             }`}
                                         >
@@ -192,9 +248,9 @@
                                         </button>
                                     ))}
                                 </div>
-                            </section>
+                            </div>
 
-                            <section>
+                            <div>
                                 <h3 className="text-sm font-black text-gray-400 mb-4 uppercase tracking-widest">이벤트 적용</h3>
                                 <div className="grid grid-cols-1 gap-2">
                                     {events.map((event, idx) => (
@@ -204,13 +260,23 @@
                                         </label>
                                     ))}
                                 </div>
-                            </section>
-                        </div>
+                            </div>
+                        </section>
 
-                        {/* 버튼 영역 */}
                         <div className="mt-auto flex gap-3">
-                            <button className="flex-1 bg-gray-100 text-gray-500 font-black py-5 rounded-2xl hover:bg-gray-200 transition-all">초기화</button>
-                            <button className="flex-[2] bg-orange-500 text-white font-black py-5 rounded-2xl hover:bg-orange-600 shadow-xl shadow-orange-100 transition-all active:scale-[0.98]">강화 시뮬레이션 시작</button>
+                            <button 
+                                className="flex-1 bg-gray-100 text-gray-500 font-black py-5 rounded-2xl hover:bg-gray-200 transition-all"
+                                onClick={() => { setSimResult(null); setSpareCost(''); setPreventDestruction([]); setSelectedEvent('없음'); }}
+                            >
+                                초기화
+                            </button>
+                            <button 
+                                className="flex-[2] bg-orange-500 text-white font-black py-5 rounded-2xl hover:bg-orange-600 shadow-xl shadow-orange-100 transition-all active:scale-[0.98] disabled:opacity-50"
+                                onClick={handleSimulate}
+                                disabled={isSimulating}
+                            >
+                                {isSimulating ? '시뮬레이션 중...' : '강화 시뮬레이션 시작'}
+                            </button>
                         </div>
                     </div>
 
@@ -218,33 +284,73 @@
                     <div className="flex-1 bg-white p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col min-h-[800px]">
                         <div className="flex items-center justify-between mb-8">
                             <div>
-                                <h2 className="text-3xl font-black text-gray-900 tracking-tighter">시뮬레이션 결과</h2>
+                                <h2 className="text-3xl font-black text-gray-900 tracking-tighter italic">RESULT</h2>
                                 <p className="text-orange-500 font-bold mt-1 tracking-tight">목표: {startStarforce}성 ➡️ {startStarforce + 1}성</p>
                             </div>
-                            <div className="bg-orange-100 text-orange-600 px-5 py-2 rounded-full text-sm font-black">평균: 0 메소</div>
-                        </div>
-
-                        <div className="flex-1 border-4 border-dashed border-gray-50 rounded-[2.5rem] bg-gray-50/30 flex flex-col items-center justify-center p-12 text-center group">
-                            <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-6 text-gray-200 group-hover:scale-110 transition-all duration-500">
-                                <i data-lucide="zap" class="w-10 h-10 text-orange-200"></i>
+                            <div className="bg-orange-100 text-orange-600 px-5 py-2 rounded-full text-sm font-black shadow-sm shadow-orange-50">
+                                {isSimulating ? '계산 중...' : `평균: ${simResult ? Math.floor(simResult.cost / 1).toLocaleString() : 0} 메소`}
                             </div>
-                            <p className="font-black text-gray-400 text-xl mb-2">시뮬레이션 데이터 대기 중</p>
-                            <p className="text-gray-300 font-bold text-sm">좌측에서 설정을 마치고<br/>강화 버튼을 눌러 시뮬레이션을 실행하세요.</p>
                         </div>
 
-                        <div className="mt-8 p-6 bg-gray-900 rounded-[2rem] text-white">
+                        {simResult ? (
+                            <div className="flex-1 border-2 border-gray-100 rounded-[2.5rem] p-8 bg-white flex flex-col justify-center animate-in fade-in zoom-in duration-300">
+                                <div className="text-center mb-10">
+                                    <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 text-green-600 rounded-3xl mb-4 shadow-sm">
+                                        <i data-lucide="party-popper" class="w-10 h-10"></i>
+                                    </div>
+                                    <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">목표 달성 성공!</h3>
+                                    <p className="text-gray-400 font-bold text-sm">총 <span className="text-orange-500">{simResult.attempts.toLocaleString()}</span>번의 강화 시도</p>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    <div className="bg-gray-50 border border-gray-100 p-6 rounded-3xl flex justify-between items-center transition-all hover:border-orange-200">
+                                        <div className="flex items-center gap-3">
+                                            <i data-lucide="coins" class="w-5 h-5 text-orange-500"></i>
+                                            <span className="text-gray-600 font-black text-sm uppercase tracking-wide">총 소모 메소</span>
+                                        </div>
+                                        <span className="text-2xl font-black text-gray-900">
+                                            {simResult.cost.toLocaleString()} <span className="text-xs font-black text-gray-400 ml-1">MESO</span>
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="bg-gray-50 border border-gray-100 p-6 rounded-3xl flex justify-between items-center transition-all hover:border-red-200">
+                                        <div className="flex items-center gap-3">
+                                            <i data-lucide="flame" class="w-5 h-5 text-red-500"></i>
+                                            <span className="text-gray-600 font-black text-sm uppercase tracking-wide">장비 파괴 횟수</span>
+                                        </div>
+                                        <span className={`text-2xl font-black ${simResult.booms > 0 ? 'text-red-500' : 'text-gray-900'}`}>
+                                            {simResult.booms} <span className="text-xs font-black text-gray-400 ml-1">TIMES</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex-1 border-4 border-dashed border-gray-50 rounded-[2.5rem] bg-gray-50/30 flex flex-col items-center justify-center p-12 text-center group">
+                                <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-6 text-gray-200 group-hover:scale-110 group-hover:bg-orange-50 group-hover:text-orange-200 transition-all duration-500">
+                                    <i data-lucide="bar-chart-3" class="w-10 h-10"></i>
+                                </div>
+                                <p className="font-black text-gray-400 text-xl mb-2">시뮬레이션 데이터 대기 중</p>
+                                <p className="text-gray-300 font-bold text-sm">좌측 설정을 확인하고<br/>시작 버튼을 눌러주세요.</p>
+                            </div>
+                        )}
+
+                        <div className="mt-8 p-6 bg-gray-900 rounded-[2rem] text-white shadow-xl shadow-gray-200">
                             <div className="flex justify-between items-center mb-4">
-                                <span className="text-xs font-black text-gray-500 uppercase tracking-widest">최근 통계 요약</span>
-                                <span className="text-orange-500 font-black text-xs">LIVE</span>
+                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Live Statistics</span>
+                                <div className="flex gap-1">
+                                    <div className="w-1 h-1 bg-orange-500 rounded-full animate-pulse"></div>
+                                    <div className="w-1 h-1 bg-orange-500 rounded-full animate-pulse delay-75"></div>
+                                    <div className="w-1 h-1 bg-orange-500 rounded-full animate-pulse delay-150"></div>
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <p className="text-[10px] font-black text-gray-500 uppercase">평균 파괴 횟수</p>
-                                    <p className="text-xl font-black">0.0회</p>
+                                    <p className="text-[10px] font-black text-gray-500 uppercase mb-1">총 강화 시도</p>
+                                    <p className="text-2xl font-black tabular-nums">{simResult ? simResult.attempts.toLocaleString() : '0'}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black text-gray-500 uppercase">소모된 스페어</p>
-                                    <p className="text-xl font-black">0개</p>
+                                    <p className="text-[10px] font-black text-gray-500 uppercase mb-1">누적 파괴 횟수</p>
+                                    <p className={`text-2xl font-black tabular-nums ${simResult && simResult.booms > 0 ? 'text-orange-500' : 'text-white'}`}>{simResult ? simResult.booms : '0'}</p>
                                 </div>
                             </div>
                         </div>
