@@ -232,6 +232,10 @@
             };
 
             const openItemModal = (item) => {
+                if (parseInt(item.starforce) === 0) {
+                    alert("강화가 불가능한 아이템입니다.");
+                    return;
+                }
                 setModalItem(item);
                 const level = Number(item.item_base_level) || 160;
                 setItemLevel(level);
