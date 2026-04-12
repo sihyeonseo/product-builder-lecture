@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2025 메이플스토리 스타포스 시뮬레이터 (KMS NEXT 최신판)</title>
-  <meta name="description" content="2025년 메이플스토리 NEXT 패치 반영! 15성 이상 하락 삭제, 30성 확장, 최신 강화 비용 공식을 적용한 가장 정확한 스타포스 시뮬레이터입니다.">
+  <title>2025 메이플 스타포스 프로 시뮬레이터</title>
+  <meta name="description" content="2025 KMS NEXT 패치 완벽 반영. 애니메이션 효과와 정확한 비용 계산을 제공하는 메이플스토리 스타포스 시뮬레이터입니다.">
   <link href='/style.css' rel='stylesheet'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <meta name="google-adsense-account" content="ca-pub-4639776942447769">
@@ -14,103 +14,94 @@
 <body>
   <header>
     <nav class="container">
-      <div class="logo">MapleStarForce 2025</div>
+      <div class="logo"><i class="fas fa-magic"></i> MapleStarPro</div>
       <ul>
         <li><a href="#simulator">시뮬레이터</a></li>
-        <li><a href="#guide">NEXT 개편 가이드</a></li>
-        <li><a href="#probability">최신 확률표</a></li>
+        <li><a href="#guide">강화 가이드</a></li>
+        <li><a href="/privacy.html">개인정보 처리방침</a></li>
       </ul>
     </nav>
   </header>
 
   <main class="container">
-    <div class="alert-banner">
-      <i class="fas fa-info-circle"></i> 2025년 3월 '메이플스토리 NEXT' 업데이트 내용이 완벽 반영되었습니다. (15성 이상 하락 삭제 및 30성 확장)
+    <section id="simulator" class="main-card">
+      <div class="setup-panel">
+        <h3><i class="fas fa-cog"></i> 장비 설정</h3>
+        <div class="input-row">
+          <div class="input-group">
+            <label>아이템 이름</label>
+            <input type="text" id="item-name-input" value="에테르넬 무기">
+          </div>
+          <div class="input-group">
+            <label>장비 레벨 (제한)</label>
+            <select id="item-level-input">
+              <option value="150">150제 (루타비스)</option>
+              <option value="160" selected>160제 (앱솔랩스)</option>
+              <option value="200">200제 (아케인셰이드)</option>
+              <option value="250">250제 (에테르넬)</option>
+            </select>
+          </div>
+        </div>
+        <div class="option-row">
+          <label><input type="checkbox" id="star-catch" checked> 스타캐치 적용</label>
+          <label><input type="checkbox" id="safeguard"> 파괴 방지 적용</label>
+          <label><input type="checkbox" id="event-30"> 썬데이 (비용 30% 할인)</label>
+        </div>
+      </div>
+
+      <div class="game-display">
+        <div id="item-container" class="item-container">
+          <div class="star-grid" id="star-display">
+            <!-- 별들이 여기에 5개씩 배치됨 -->
+          </div>
+          <div class="item-frame">
+            <div class="item-icon-wrapper" id="item-icon-anim">
+              <i class="fas fa-shield-alt main-icon"></i>
+            </div>
+            <div class="status-overlay" id="status-overlay"></div>
+          </div>
+          <div class="item-name-tag" id="display-item-name">에테르넬 무기</div>
+        </div>
+
+        <div class="prob-display">
+          <div class="prob-item"><span>성공</span><span id="success-rate">100%</span></div>
+          <div class="prob-item"><span>유지</span><span id="keep-rate">0%</span></div>
+          <div class="prob-item"><span>하락</span><span id="drop-rate">0%</span></div>
+          <div class="prob-item"><span>파괴</span><span id="destroy-rate">0%</span></div>
+        </div>
+      </div>
+
+      <div class="action-panel">
+        <div class="cost-info">
+          <div>강화 비용: <span id="upgrade-cost">0</span> <small>메조</small></div>
+          <div>누적 비용: <span id="total-cost">0</span> <small>메조</small></div>
+        </div>
+        <div class="buttons">
+          <button id="btn-upgrade" class="game-btn primary">강화 시작</button>
+          <button id="btn-reset" class="game-btn secondary">전체 초기화</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="stats-grid">
+      <section class="card">
+        <h3><i class="fas fa-chart-bar"></i> 시뮬레이션 통계</h3>
+        <div class="stat-row"><span>총 강화 횟수</span><span id="stat-total-try">0회</span></div>
+        <div class="stat-row"><span>파괴 횟수</span><span id="stat-total-destroy">0회</span></div>
+        <div class="stat-row"><span>최대 도달 등급</span><span id="stat-max-star">0성</span></div>
+      </section>
+      <section class="card">
+        <h3><i class="fas fa-history"></i> 최근 기록</h3>
+        <div class="log-container" id="upgrade-log">
+          <p class="empty-log">준비 완료...</p>
+        </div>
+      </section>
     </div>
-
-    <section id="simulator" class="card">
-      <h2><i class="fas fa-hammer"></i> 2025 최신 스타포스 시뮬레이터</h2>
-      <div class="sim-wrapper">
-        <div class="item-display">
-          <div class="item-icon">⚔️</div>
-          <div class="item-info">
-            <span id="item-name">에테르넬/앱솔랩스 장비 (160제 이상)</span>
-            <div class="star-rating" id="star-display"></div>
-          </div>
-        </div>
-        
-        <div class="controls">
-          <div class="option-group">
-            <label title="성공 확률의 5%가 곱연산으로 증가합니다."><input type="checkbox" id="star-catch" checked> 스타캐치 적용</label>
-            <label title="2025 개편: 비용 200%, 17성 이상도 적용 가능"><input type="checkbox" id="safeguard"> 파괴 방지 (12성~25성 가능)</label>
-          </div>
-          <div class="stats-box">
-            <p>현재 단계: <span id="current-stars">0</span>성</p>
-            <p>성공 확률: <span id="success-rate">100</span>%</p>
-            <p>실패(유지): <span id="keep-rate">0</span>%</p>
-            <p>실패(하락): <span id="drop-rate">0</span>%</p>
-            <p>파괴 확률: <span id="destroy-rate">0</span>%</p>
-          </div>
-          <div class="cost-box">
-            <p>강화 비용: <span id="upgrade-cost">0</span> 메조</p>
-            <p>누적 비용: <span id="total-cost">0</span> 메조</p>
-          </div>
-          <button id="btn-upgrade" class="btn-primary">강화하기</button>
-          <button id="btn-reset" class="btn-secondary">초기화</button>
-        </div>
-
-        <div class="log-box" id="upgrade-log">
-          <p class="log-entry">2025 최신 시스템으로 강화를 시작하세요!</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="guide" class="card">
-      <h2><i class="fas fa-book"></i> 2025 메이플스토리 NEXT 스타포스 가이드</h2>
-      <div class="content">
-        <h3>1. 15성 이상 '등급 하락' 완전 삭제</h3>
-        <p>기존에는 15성, 20성 등 특정 구간에서만 하락 방지가 되었으나, <strong>2025년 패치 이후 모든 15성 이상 구간에서 실패 시 등급이 떨어지지 않습니다.</strong> 이제 별이 떨어지는 스트레스 없이 강화할 수 있습니다.</p>
-        
-        <h3>2. 최대 강화 30성 확장</h3>
-        <p>138레벨 이상 장비의 최대 스타포스가 25성에서 <strong>30성</strong>으로 확장되었습니다. 기존의 22성 아이템은 가치가 유지되도록 보정되었습니다.</p>
-        
-        <h3>3. 파괴 방지 및 비용 변화</h3>
-        <ul>
-          <li><strong>파괴 방지:</strong> 비용이 기본의 100%에서 200%로 상향되었으나, 17성 이상 모든 구간에서 선택 가능해졌습니다.</li>
-          <li><strong>비용 합리화:</strong> 17~22성 구간의 강화 비용이 조정되어 기대 비용이 현실화되었습니다.</li>
-        </ul>
-      </div>
-    </section>
-
-    <section id="probability" class="card">
-      <h2><i class="fas fa-chart-line"></i> 2025 최신 단계별 확률표 (KMS 기준)</h2>
-      <table class="prob-table">
-        <thead>
-          <tr>
-            <th>구간</th>
-            <th>성공</th>
-            <th>유지</th>
-            <th>하락</th>
-            <th>파괴</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>0-10성</td><td>100~45%</td><td>0~55%</td><td>0%</td><td>0%</td></tr>
-          <tr><td>11-15성</td><td>45~30%</td><td>0%</td><td>55~67%</td><td>0.6~2.1%</td></tr>
-          <tr><td>16-25성</td><td>30~10%</td><td>68~72%</td><td><strong>0%</strong></td><td>2.1~18%</td></tr>
-          <tr><td>26-30성</td><td>8~1%</td><td>72~79%</td><td><strong>0%</strong></td><td>19.8%</td></tr>
-        </tbody>
-      </table>
-    </section>
   </main>
 
   <footer>
     <div class="container">
-      <p>&copy; 2026 MapleStarForce Simulator. 2025 KMS NEXT Update Applied.</p>
-      <div class="footer-links">
-        <a href="/privacy.html">개인정보 처리방침</a>
-        <a href="https://github.com/sihyeonseo/product-builder-lecture">GitHub Repository</a>
-      </div>
+      <p>&copy; 2026 MapleStarPro. 최신 KMS NEXT 패치 로직 적용 완료.</p>
     </div>
   </footer>
 
