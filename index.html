@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 메이플 스타포스 Pro V3.1 - 최신 고증판</title>
+    <title>2025 메이플 스타포스 Pro V3.2 - 리얼 인게임 고증</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -26,7 +26,7 @@
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
         body { font-family: "Pretendard", sans-serif; letter-spacing: -0.025em; }
-        .star-grid { display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); gap: 4px; }
+        .star-group { display: flex; gap: 4px; }
         .star { font-size: 0.8rem; color: #374151; transition: all 0.2s; }
         .star.active { color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.8); }
     </style>
@@ -60,39 +60,34 @@
             const [lastResult, setLastResult] = useState({ type: '', msg: '강화 준비 완료' });
             const [isAnimating, setIsAnimating] = useState(false);
 
-            // 1. 최신 확률 데이터 (KMS 2025 NEXT)
+            // 1. 확률 데이터 (KMS NEXT 2025 최종)
             const currentProb = useMemo(() => {
                 let success = 30;
                 let destroy = 0;
 
-                // 0~15성 기본 확률
                 if (currentStars < 10) success = 95 - (currentStars * 5);
                 else if (currentStars < 15) {
                     const rates = [45, 40, 35, 30, 30];
                     success = rates[currentStars - 10];
                 }
 
-                // 15성 이상 확률 (KMS NEXT: 하락 0%)
                 if (currentStars >= 15) {
                     if (currentStars <= 21) success = 30;
                     else if (currentStars === 22) success = 3;
                     else if (currentStars === 23) success = 2;
-                    else if (currentStars >= 24) success = 1;
+                    else success = 1;
                 }
 
-                // 파괴 확률 (KMS NEXT 최신 데이터)
                 if (currentStars >= 12 && !preventDestruction.includes(currentStars)) {
-                    if (currentStars < 15) destroy = 0.6 + (currentStars - 12) * 0.7; // 0.6, 1.3, 2.0
+                    if (currentStars < 15) destroy = 0.6 + (currentStars - 12) * 0.7;
                     else if (currentStars <= 17) destroy = 2.1;
                     else if (currentStars <= 19) destroy = 2.8;
                     else if (currentStars <= 21) destroy = 7.0;
-                    else if (currentStars >= 22) destroy = 19.4;
+                    else destroy = 19.4;
                 }
 
-                // 이벤트 보정
                 if ((selectedEvent.includes("100%") || selectedEvent.includes("샤이닝")) && [5, 10, 15].includes(currentStars)) {
-                    success = 100;
-                    destroy = 0;
+                    success = 100; destroy = 0;
                 }
 
                 return {
@@ -102,22 +97,20 @@
                 };
             }, [currentStars, preventDestruction, selectedEvent]);
 
-            // 2. 최신 비용 공식 (KMS 2025 NEXT)
-            const getUpgradeCost = (stars) => {
+            // 2. 비용 계산 (할인 내역 포함)
+            const costData = useMemo(() => {
                 let D = 200;
-                if (stars < 10) D = 1000;
-                else if (stars < 15) D = 400;
+                if (currentStars < 10) D = 1000;
+                else if (currentStars < 15) D = 400;
                 else {
-                    // 특정 구간 보정
-                    if (stars === 17) D = 150;
-                    else if (stars === 18) D = 70;
-                    else if (stars === 19) D = 45;
-                    else if (stars === 21) D = 125;
+                    if (currentStars === 17) D = 150;
+                    else if (currentStars === 18) D = 70;
+                    else if (currentStars === 19) D = 45;
+                    else if (currentStars === 21) D = 125;
                 }
 
-                let cost = 1000 + Math.pow(itemLevel, 3) * Math.pow(stars + 1, 2.7) / D;
-
-                // 할인 중첩 (합연산 후 적용)
+                const baseCost = 1000 + Math.pow(itemLevel, 3) * Math.pow(currentStars + 1, 2.7) / D;
+                
                 let discountRate = 0;
                 if (selectedEvent.includes("30%") || selectedEvent.includes("샤이닝")) discountRate += 0.30;
                 if (discounts.silver) discountRate += 0.03;
@@ -125,25 +118,23 @@
                 if (discounts.diamond) discountRate += 0.10;
                 if (discounts.pc) discountRate += 0.05;
 
-                cost = cost * (1 - Math.min(discountRate, 0.5)); // 최대 50% 제한
+                const actualCost = baseCost * (1 - Math.min(discountRate, 0.5));
+                const safeguardCost = preventDestruction.includes(currentStars) ? actualCost : 0;
+                const total = Math.round((actualCost + safeguardCost) / 100) * 100;
+                const saved = Math.round((baseCost - actualCost) / 100) * 100;
 
-                if (preventDestruction.includes(stars)) cost *= 2; // 파방 비용 2배
-
-                return Math.round(cost / 100) * 100;
-            };
+                return { total, saved, base: Math.round(baseCost / 100) * 100 };
+            }, [currentStars, itemLevel, selectedEvent, discounts, preventDestruction]);
 
             const handleEnhance = () => {
                 if (isAnimating || currentStars >= 30) return;
-
-                const cost = getUpgradeCost(currentStars);
-                setTotalCost(prev => prev + cost);
+                setTotalCost(prev => prev + costData.total);
                 setTotalAttempts(prev => prev + 1);
                 setIsAnimating(true);
 
                 setTimeout(() => {
                     const rand = Math.random() * 100;
                     if (rand < currentProb.success) {
-                        // 1+1 이벤트 (12성까지)
                         if (selectedEvent.includes("1+1") && currentStars < 12) {
                             setCurrentStars(prev => Math.min(prev + 2, 12));
                             setLastResult({ type: 'success', msg: '강화 성공! (1+1 발동)' });
@@ -157,7 +148,6 @@
                         setCurrentStars(12);
                         setLastResult({ type: 'destroy', msg: '장비가 파괴되었습니다!' });
                     } else {
-                        // KMS NEXT: 하락 없음
                         setLastResult({ type: 'fail-keep', msg: '강화 실패 (단계 유지)' });
                     }
                     setIsAnimating(false);
@@ -171,34 +161,46 @@
 
             useEffect(() => lucide.createIcons(), [lastResult, currentStars, selectedEvent, discounts, preventDestruction]);
 
+            const StarRow = ({ start }) => (
+                <div className="flex gap-3 justify-center mb-2">
+                    {[0, 1, 2].map(g => (
+                        <div key={g} className="star-group">
+                            {[0, 1, 2, 3, 4].map(s => {
+                                const idx = start + g * 5 + s;
+                                return <i key={idx} className={`fas fa-star star ${idx < currentStars ? 'active' : ''}`}></i>
+                            })}
+                        </div>
+                    ))}
+                </div>
+            );
+
             return (
                 <div className="max-w-7xl mx-auto p-4 md:p-8 min-h-screen flex flex-col md:flex-row gap-6">
                     <div className="flex-1 bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col gap-6">
                         <section className="bg-orange-50 p-6 rounded-2xl border border-orange-100">
                             <h2 className="text-lg font-black mb-4 flex items-center gap-2 text-orange-800">장비 설정</h2>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-orange-600 uppercase tracking-widest ml-1">장비 레벨</label>
-                                    <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-4 font-black outline-none focus:ring-2 focus:ring-orange-500" value={itemLevel} onChange={(e) => setItemLevel(Number(e.target.value))}>
-                                        {[130, 140, 150, 160, 200, 250].map(lv => <option key={lv} value={lv}>{lv}제 장비</option>)}
+                                    <label className="text-[10px] font-black text-orange-600 uppercase ml-1">레벨</label>
+                                    <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 font-black text-sm outline-none" value={itemLevel} onChange={(e) => setItemLevel(Number(e.target.value))}>
+                                        {[130, 140, 150, 160, 200, 250].map(lv => <option key={lv} value={lv}>{lv}제</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-orange-600 uppercase tracking-widest ml-1">스페어 비용</label>
-                                    <input type="number" className="w-full bg-white border border-orange-200 rounded-xl py-3 px-4 text-right font-black outline-none focus:ring-2 focus:ring-orange-500" value={spareCost} onChange={(e) => setSpareCost(e.target.value)} />
-                                    <p className="text-[10px] text-orange-600 font-bold text-right italic">{formatKoreanCurrency(Number(spareCost))}</p>
+                                    <label className="text-[10px] font-black text-orange-600 uppercase ml-1">스페어</label>
+                                    <input type="number" className="w-full bg-white border border-orange-200 rounded-xl py-3 px-3 text-right font-black text-sm outline-none" value={spareCost} onChange={(e) => setSpareCost(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-orange-600 uppercase ml-1">시작</label>
+                                    <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 font-black text-sm outline-none" value={currentStars} onChange={(e) => setCurrentStars(Number(e.target.value))} disabled={totalAttempts > 0}>
+                                        {[...Array(30).keys()].map(s => <option key={s} value={s}>{s}성</option>)}
+                                    </select>
                                 </div>
                             </div>
+                            <p className="text-[10px] text-orange-600 font-bold text-right italic mt-2">{formatKoreanCurrency(Number(spareCost))}</p>
                         </section>
 
                         <div className="flex-1 space-y-6 overflow-y-auto pr-2">
-                            <section>
-                                <h3 className="text-[10px] font-black text-gray-400 mb-3 uppercase tracking-widest">강화 시작 단계 설정</h3>
-                                <select className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 font-black outline-none focus:ring-2 focus:ring-orange-500" value={currentStars} onChange={(e) => setCurrentStars(Number(e.target.value))} disabled={totalAttempts > 0}>
-                                    {[...Array(30).keys()].map(s => <option key={s} value={s}>{s}성에서 시작</option>)}
-                                </select>
-                            </section>
-
                             <section>
                                 <h3 className="text-[10px] font-black text-gray-400 mb-3 uppercase tracking-widest">파괴방지 (15, 16, 17성)</h3>
                                 <div className="grid grid-cols-3 gap-2">
@@ -232,47 +234,54 @@
                                 </div>
                             </section>
                         </div>
-
-                        <div className="pt-4 flex gap-2">
-                            <button className="flex-1 bg-gray-100 text-gray-500 font-black py-4 rounded-xl" onClick={resetAll}>초기화</button>
-                            <button className="flex-[2] bg-orange-500 text-white font-black py-4 rounded-xl shadow-lg disabled:opacity-50" onClick={handleEnhance} disabled={isAnimating || currentStars >= 30}>강화 시도</button>
-                        </div>
                     </div>
 
                     <div className="flex-1 bg-gray-900 p-6 md:p-8 rounded-[2rem] shadow-2xl flex flex-col items-center justify-between text-white relative">
                         <div className="w-full flex justify-between items-start mb-6">
-                            <div><h2 className="text-2xl font-black italic text-orange-500 tracking-tighter uppercase font-serif">STARFORCE</h2><p className="text-[9px] font-bold text-gray-500 tracking-[0.3em]">KMS NEXT 2025</p></div>
-                            <div className="text-right"><p className="text-2xl font-black">{currentStars} <span className="text-orange-500 text-sm">STARS</span></p></div>
+                            <div><h2 className="text-2xl font-black italic text-orange-500 tracking-tighter uppercase">ENHANCE</h2><p className="text-[9px] font-bold text-gray-500 tracking-[0.3em]">KMS NEXT 2025</p></div>
+                            <div className="text-right font-black"><span className="text-3xl">{currentStars}</span> <span className="text-orange-500 text-sm">STARS</span></div>
                         </div>
 
                         <div className={`flex flex-col items-center gap-6 w-full ${isAnimating ? 'animate-shake' : ''}`}>
-                            <div className="star-grid w-full max-w-sm px-2">
-                                {[...Array(30).keys()].map(s => <div key={s} className="flex justify-center"><i className={`fas fa-star star ${s < currentStars ? 'active' : ''}`}></i></div>)}
+                            <div className="w-full">
+                                <StarRow start={0} />
+                                <StarRow start={15} />
                             </div>
                             <div className={`w-28 h-28 bg-white/5 border-2 border-white/10 rounded-[2.5rem] flex items-center justify-center transition-all ${lastResult.type === 'destroy' ? 'grayscale opacity-50' : ''}`}>
                                 <i data-lucide="sword" class={`w-14 h-14 ${lastResult.type === 'success' ? 'text-orange-500 animate-success' : 'text-gray-400'}`}></i>
                             </div>
-                            <div className="text-center space-y-4">
-                                <p className={`text-xl font-black px-10 py-3 rounded-full border-2 ${lastResult.type === 'success' ? 'border-green-500 text-green-500 bg-green-500/10 shadow-[0_0_20px_rgba(34,197,94,0.3)]' : lastResult.type === 'destroy' ? 'border-red-600 text-red-600 bg-red-600/10' : 'border-gray-500 text-gray-400 bg-gray-500/10'}`}>{lastResult.msg}</p>
-                                <div className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 flex gap-6 text-[10px] font-black uppercase tracking-widest shadow-inner">
+                            <div className="text-center space-y-4 w-full">
+                                <p className={`text-xl font-black px-10 py-3 rounded-full border-2 ${lastResult.type === 'success' ? 'border-green-500 text-green-500 bg-green-500/10' : lastResult.type === 'destroy' ? 'border-red-600 text-red-600 bg-red-600/10' : 'border-gray-500 text-gray-400'}`}>{lastResult.msg}</p>
+                                <div className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 flex gap-6 text-[10px] font-black uppercase tracking-widest shadow-inner justify-center">
                                     <div className="flex flex-col"><span className="text-gray-500 mb-1">Success</span><span className="text-green-500 text-sm">{currentProb.success}%</span></div>
                                     <div className="w-[1px] bg-white/10"></div>
-                                    <div className="flex flex-col"><span className="text-gray-500 mb-1">Fail(Keep)</span><span className="text-gray-300 text-sm">{currentProb.fail}%</span></div>
+                                    <div className="flex flex-col"><span className="text-gray-500 mb-1">Keep</span><span className="text-gray-300 text-sm">{currentProb.fail}%</span></div>
                                     <div className="w-[1px] bg-white/10"></div>
                                     <div className="flex flex-col"><span className="text-gray-500 mb-1">Boom</span><span className="text-red-500 text-sm">{currentProb.destroy}%</span></div>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button className="flex-1 bg-white/10 text-gray-400 font-black py-4 rounded-xl hover:bg-white/20 transition-all" onClick={resetAll}>초기화</button>
+                                    <button className="flex-[3] bg-orange-500 text-white font-black py-4 rounded-xl shadow-lg disabled:opacity-50" onClick={handleEnhance} disabled={isAnimating || currentStars >= 30}>강화 시도</button>
                                 </div>
                             </div>
                         </div>
 
                         <div className="w-full bg-white/5 border border-white/10 p-6 rounded-[2rem] mt-8">
-                            <div className="grid grid-cols-2 gap-4 text-center">
-                                <div><p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Cost Per Try</p><p className="text-sm font-black text-orange-400 tabular-nums">{getUpgradeCost(currentStars).toLocaleString()} M</p></div>
-                                <div><p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Total Tries</p><p className="text-sm font-black tabular-nums">{totalAttempts} 회</p></div>
+                            <div className="flex justify-between items-center mb-4 px-2">
+                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Upgrade Cost</p>
+                                <div className="text-right">
+                                    <p className="text-sm font-black text-orange-400 tabular-nums">{costData.total.toLocaleString()} M</p>
+                                    {costData.saved > 0 && <p className="text-[9px] text-green-500 font-bold">(-{costData.saved.toLocaleString()}M 할인적용)</p>}
+                                </div>
                             </div>
-                            <div className="h-[1px] bg-white/10 my-4"></div>
-                            <div className="text-center">
+                            <div className="h-[1px] bg-white/5 mb-4"></div>
+                            <div className="grid grid-cols-2 gap-4 text-center">
+                                <div><p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Total Tries</p><p className="text-sm font-black tabular-nums">{totalAttempts} 회</p></div>
+                                <div><p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Destroyed</p><p className="text-sm font-black text-red-500 tabular-nums">{totalBooms} 회</p></div>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-white/5 text-center">
                                 <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Total Consumed</p>
-                                <p className="text-xl font-black tabular-nums tracking-tight">{totalCost.toLocaleString()}</p>
+                                <p className="text-xl font-black tabular-nums tracking-tight">{totalCost.toLocaleString()} <span className="text-xs font-normal text-gray-500">M</span></p>
                                 <p className="text-[10px] text-orange-500 font-bold opacity-80">{formatKoreanCurrency(totalCost)}</p>
                             </div>
                         </div>
