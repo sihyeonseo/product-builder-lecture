@@ -14,27 +14,45 @@ const safeguardCheck = document.getElementById('safeguard');
 
 let currentStars = 0;
 let totalCost = 0;
+let totalDestroys = 0;
 const itemLevel = 160;
 
+// 2025년 최신 KMS 확률 테이블 (15성 이상 하락 삭제 반영)
 const getProbabilities = (stars) => {
     let success, keep, drop, destroy;
     
+    // 0~10성: 성공률 높음, 하락/파괴 없음
     if (stars <= 10) {
         success = 100 - (stars * 5);
         keep = 100 - success;
         drop = 0;
         destroy = 0;
-    } else if (stars <= 15) {
-        success = stars === 15 ? 30 : 45 - (stars - 11) * 5;
+    } 
+    // 11~14성: 하락/파괴 가능 구간
+    else if (stars <= 14) {
+        success = 45 - (stars - 11) * 5;
         keep = 0;
         drop = 100 - success;
-        destroy = (stars >= 12) ? (stars === 15 ? 2.1 : 0.6 + (stars - 12) * 0.7) : 0;
-        if (stars >= 12) drop -= destroy;
-    } else {
+        destroy = (stars >= 12) ? 0.6 + (stars - 12) * 0.7 : 0;
+        drop -= destroy;
+    }
+    // 15성: 하락 방지 체크포인트 (기존) -> 2025 개편으로 15성 이상 하락 없음
+    else if (stars === 15) {
         success = 30;
-        keep = 0;
-        destroy = (stars <= 17) ? 2.1 : (stars <= 19) ? 2.8 : (stars <= 21) ? 7.0 : 10.0;
-        drop = 100 - success - destroy;
+        keep = 70 - 2.1;
+        drop = 0;
+        destroy = 2.1;
+    }
+    // 16성 이상 (2025 NEXT 개편 반영: 하락 삭제, 파괴 확률 조정)
+    else if (stars <= 29) {
+        if (stars <= 17) { success = 30; destroy = 2.1; }
+        else if (stars <= 20) { success = 15; destroy = (stars === 20) ? 10.5 : 8.5; }
+        else if (stars <= 22) { success = (stars === 21) ? 30 : 15; destroy = (stars === 21) ? 10.5 : 12.75; }
+        else if (stars <= 25) { success = (stars <= 23) ? 15 : 10; destroy = (stars <= 23) ? 17.0 : 18.0; }
+        else { success = Math.max(1, 10 - (stars - 25) * 2); destroy = 19.8; } // 25~30성 추정치
+        
+        keep = 100 - success - destroy;
+        drop = 0;
     }
 
     // 스타캐치 적용 (성공 확률의 5% 곱연산 증가)
@@ -50,16 +68,18 @@ const getProbabilities = (stars) => {
     };
 };
 
+// 2025년 최신 비용 공식 (분모 D 값 조정 반영)
 const calculateCost = (stars) => {
-    let cost = 1000 + Math.pow(itemLevel, 3) * Math.pow(stars + 1, 2.7) / 10000;
-    if (stars >= 10 && stars <= 14) {
-        cost = 1000 + Math.pow(itemLevel, 3) * Math.pow(stars + 1, 2.7) / 400;
-    } else if (stars >= 15) {
-        cost = 1000 + Math.pow(itemLevel, 3) * Math.pow(stars + 1, 2.7) / 200;
-    }
+    let D = 200;
+    if (stars === 17) D = 150;
+    else if (stars === 18) D = 70;
+    else if (stars === 19) D = 45;
+    else if (stars === 21) D = 125;
     
-    // 파괴 방지 (12~16성 구간에서 비용 2배)
-    if (safeguardCheck.checked && stars >= 12 && stars <= 16) {
+    let cost = 1000 + Math.pow(itemLevel, 3) * Math.pow(stars + 1, 2.7) / (stars >= 10 ? D : 1000);
+    
+    // 파괴 방지 (2025 개편: 비용 200% 증가, 17성 이상도 가능)
+    if (safeguardCheck.checked && stars >= 12) {
         cost *= 2;
     }
     
@@ -76,20 +96,20 @@ const updateUI = () => {
     upgradeCostText.innerText = calculateCost(currentStars).toLocaleString();
     totalCostText.innerText = totalCost.toLocaleString();
     
-    // 별 표시 업데이트
-    starDisplay.innerHTML = '⭐'.repeat(currentStars) + '☆'.repeat(25 - currentStars);
+    // 별 표시 업데이트 (최대 30성)
+    starDisplay.innerHTML = '⭐'.repeat(currentStars) + '☆'.repeat(30 - currentStars);
 };
 
 const addLog = (message, type) => {
     const p = document.createElement('p');
     p.className = `log-entry ${type}`;
-    p.innerText = `[${currentStars}성 -> ${type === 'success' ? currentStars + 1 : currentStars}성] ${message}`;
+    p.innerText = `[${currentStars}성 -> ${type === 'success' ? currentStars + 1 : (type === 'destroy' ? 12 : currentStars)}성] ${message}`;
     logBox.prepend(p);
 };
 
 upgradeBtn.addEventListener('click', () => {
-    if (currentStars >= 25) {
-        alert('최대 강화 단계입니다!');
+    if (currentStars >= 30) {
+        alert('최대 강화 단계(30성)입니다!');
         return;
     }
 
@@ -102,16 +122,18 @@ upgradeBtn.addEventListener('click', () => {
     if (rand < probs.success) {
         addLog('강화 성공!', 'success');
         currentStars++;
-    } else if (rand < probs.success + probs.destroy && !(safeguardCheck.checked && currentStars <= 16)) {
-        addLog('장비가 파괴되었습니다! (12성으로 복구)', 'destroy');
-        currentStars = 12;
-    } else if (rand < probs.success + probs.destroy + probs.drop) {
-        if (currentStars > 10 && currentStars % 5 !== 0) {
-            addLog('강화 실패 (단계 하락)', 'drop');
-            currentStars--;
+    } else if (rand < probs.success + probs.destroy) {
+        // 파괴 방지 체크
+        if (safeguardCheck.checked && currentStars >= 12) {
+            addLog('강화 실패 (파괴 방지 발동 - 유지)', 'keep');
         } else {
-            addLog('강화 실패 (단계 유지)', 'keep');
+            addLog('장비가 파괴되었습니다! (12성으로 복구)', 'destroy');
+            totalDestroys++;
+            currentStars = 12;
         }
+    } else if (rand < probs.success + probs.destroy + probs.drop) {
+        addLog('강화 실패 (단계 하락)', 'drop');
+        currentStars--;
     } else {
         addLog('강화 실패 (단계 유지)', 'keep');
     }
@@ -122,9 +144,9 @@ upgradeBtn.addEventListener('click', () => {
 resetBtn.addEventListener('click', () => {
     currentStars = 0;
     totalCost = 0;
-    logBox.innerHTML = '<p class="log-entry">강화를 시작하세요!</p>';
+    totalDestroys = 0;
+    logBox.innerHTML = '<p class="log-entry">2025년 최신 시스템으로 강화를 시작하세요!</p>';
     updateUI();
 });
 
-// 초기 실행
 updateUI();

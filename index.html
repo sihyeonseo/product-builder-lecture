@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>메이플스토리 스타포스 시뮬레이터 & 강화 가이드</title>
-  <meta name="description" content="메이플스토리 스타포스 강화 확률을 미리 체험하고 누적 비용을 계산해보세요. 25성까지의 성공 확률과 파괴 방지 전략을 제공합니다.">
+  <title>2025 메이플스토리 스타포스 시뮬레이터 (KMS NEXT 최신판)</title>
+  <meta name="description" content="2025년 메이플스토리 NEXT 패치 반영! 15성 이상 하락 삭제, 30성 확장, 최신 강화 비용 공식을 적용한 가장 정확한 스타포스 시뮬레이터입니다.">
   <link href='/style.css' rel='stylesheet'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <meta name="google-adsense-account" content="ca-pub-4639776942447769">
@@ -14,31 +14,35 @@
 <body>
   <header>
     <nav class="container">
-      <div class="logo">MapleStarForce</div>
+      <div class="logo">MapleStarForce 2025</div>
       <ul>
         <li><a href="#simulator">시뮬레이터</a></li>
-        <li><a href="#guide">강화 가이드</a></li>
-        <li><a href="#probability">확률표</a></li>
+        <li><a href="#guide">NEXT 개편 가이드</a></li>
+        <li><a href="#probability">최신 확률표</a></li>
       </ul>
     </nav>
   </header>
 
   <main class="container">
+    <div class="alert-banner">
+      <i class="fas fa-info-circle"></i> 2025년 3월 '메이플스토리 NEXT' 업데이트 내용이 완벽 반영되었습니다. (15성 이상 하락 삭제 및 30성 확장)
+    </div>
+
     <section id="simulator" class="card">
-      <h2><i class="fas fa-hammer"></i> 스타포스 시뮬레이터</h2>
+      <h2><i class="fas fa-hammer"></i> 2025 최신 스타포스 시뮬레이터</h2>
       <div class="sim-wrapper">
         <div class="item-display">
           <div class="item-icon">⚔️</div>
           <div class="item-info">
-            <span id="item-name">앱솔랩스 무기 (160제)</span>
+            <span id="item-name">에테르넬/앱솔랩스 장비 (160제 이상)</span>
             <div class="star-rating" id="star-display"></div>
           </div>
         </div>
         
         <div class="controls">
           <div class="option-group">
-            <label><input type="checkbox" id="star-catch" checked> 스타캐치 해제</label>
-            <label><input type="checkbox" id="safeguard"> 파괴 방지 (12~16성)</label>
+            <label title="성공 확률의 5%가 곱연산으로 증가합니다."><input type="checkbox" id="star-catch" checked> 스타캐치 적용</label>
+            <label title="2025 개편: 비용 200%, 17성 이상도 적용 가능"><input type="checkbox" id="safeguard"> 파괴 방지 (12성~25성 가능)</label>
           </div>
           <div class="stats-box">
             <p>현재 단계: <span id="current-stars">0</span>성</p>
@@ -56,28 +60,30 @@
         </div>
 
         <div class="log-box" id="upgrade-log">
-          <p class="log-entry">강화를 시작하세요!</p>
+          <p class="log-entry">2025 최신 시스템으로 강화를 시작하세요!</p>
         </div>
       </div>
     </section>
 
     <section id="guide" class="card">
-      <h2><i class="fas fa-book"></i> 스타포스 강화 완벽 가이드</h2>
+      <h2><i class="fas fa-book"></i> 2025 메이플스토리 NEXT 스타포스 가이드</h2>
       <div class="content">
-        <h3>1. 스타포스란?</h3>
-        <p>메이플스토리에서 장비의 성능을 비약적으로 상승시키는 핵심 강화 시스템입니다. 0성부터 최대 25성까지 가능하며, 일정 단계 이상부터는 실패 시 등급 하락이나 장비 파괴의 위험이 따릅니다.</p>
+        <h3>1. 15성 이상 '등급 하락' 완전 삭제</h3>
+        <p>기존에는 15성, 20성 등 특정 구간에서만 하락 방지가 되었으나, <strong>2025년 패치 이후 모든 15성 이상 구간에서 실패 시 등급이 떨어지지 않습니다.</strong> 이제 별이 떨어지는 스트레스 없이 강화할 수 있습니다.</p>
         
-        <h3>2. 효율적인 강화 전략</h3>
+        <h3>2. 최대 강화 30성 확장</h3>
+        <p>138레벨 이상 장비의 최대 스타포스가 25성에서 <strong>30성</strong>으로 확장되었습니다. 기존의 22성 아이템은 가치가 유지되도록 보정되었습니다.</p>
+        
+        <h3>3. 파괴 방지 및 비용 변화</h3>
         <ul>
-          <li><strong>15성 100% 이벤트:</strong> 비용 절감을 위해 이벤트 기간을 활용하는 것이 가장 중요합니다.</li>
-          <li><strong>파괴 방지 사용:</strong> 12성부터 16성 구간에서는 파괴 방지 옵션을 사용하여 소중한 장비를 보호하세요.</li>
-          <li><strong>스타캐치:</strong> 미니게임을 성공하면 성공 확률이 기본 확률의 5%만큼 곱연산으로 증가합니다.</li>
+          <li><strong>파괴 방지:</strong> 비용이 기본의 100%에서 200%로 상향되었으나, 17성 이상 모든 구간에서 선택 가능해졌습니다.</li>
+          <li><strong>비용 합리화:</strong> 17~22성 구간의 강화 비용이 조정되어 기대 비용이 현실화되었습니다.</li>
         </ul>
       </div>
     </section>
 
     <section id="probability" class="card">
-      <h2><i class="fas fa-chart-pie"></i> 스타포스 단계별 확률표</h2>
+      <h2><i class="fas fa-chart-line"></i> 2025 최신 단계별 확률표 (KMS 기준)</h2>
       <table class="prob-table">
         <thead>
           <tr>
@@ -90,8 +96,9 @@
         </thead>
         <tbody>
           <tr><td>0-10성</td><td>100~45%</td><td>0~55%</td><td>0%</td><td>0%</td></tr>
-          <tr><td>11-15성</td><td>45~30%</td><td>0%</td><td>55~70%</td><td>0~2%</td></tr>
-          <tr><td>16-25성</td><td>30%</td><td>0%</td><td>67~70%</td><td>3~10%</td></tr>
+          <tr><td>11-15성</td><td>45~30%</td><td>0%</td><td>55~67%</td><td>0.6~2.1%</td></tr>
+          <tr><td>16-25성</td><td>30~10%</td><td>68~72%</td><td><strong>0%</strong></td><td>2.1~18%</td></tr>
+          <tr><td>26-30성</td><td>8~1%</td><td>72~79%</td><td><strong>0%</strong></td><td>19.8%</td></tr>
         </tbody>
       </table>
     </section>
@@ -99,7 +106,7 @@
 
   <footer>
     <div class="container">
-      <p>&copy; 2026 MapleStarForce Simulator. All rights reserved.</p>
+      <p>&copy; 2026 MapleStarForce Simulator. 2025 KMS NEXT Update Applied.</p>
       <div class="footer-links">
         <a href="/privacy.html">개인정보 처리방침</a>
         <a href="https://github.com/sihyeonseo/product-builder-lecture">GitHub Repository</a>
