@@ -50,14 +50,14 @@
 
         const API_KEY = "test_f822a00191128c195adc6d1d0d220e2f821288d2387e71da7c2fde6aaaf1ce53efe8d04e6d233bd35cf2fabdeb93fb0d";
 
-        const formatKoreanCurrency = (num) => {
-            if (!num || num === 0) return '0메소';
+        const formatKoreanCurrency = (num, showSuffix = true) => {
+            if (!num || num === 0) return '0' + (showSuffix ? '메소' : '');
             const unitEok = Math.floor(num / 100000000);
             const unitMan = Math.floor((num % 100000000) / 10000);
             let result = '';
             if (unitEok > 0) result += `${unitEok}억 `;
             if (unitMan > 0) result += `${unitMan}만`;
-            return result.trim() + ' 메소';
+            return result.trim() + (showSuffix ? ' 메소' : '');
         };
 
         const BASE_PROB_TABLE = [
@@ -95,7 +95,6 @@
             const [lastResult, setLastResult] = useState({ type: '', msg: '강화 준비 완료' });
             const [isAnimating, setIsAnimating] = useState(false);
 
-            // 캐릭터 정보 상태
             const [charNickname, setCharNickname] = useState('');
             const [searchResult, setSearchResult] = useState(null);
             const [isSearching, setIsSearching] = useState(false);
@@ -197,7 +196,7 @@
 
                     setSearchResult({
                         basic,
-                        combatPower: parseInt(combatPower).toLocaleString(),
+                        combatPower: formatKoreanCurrency(parseInt(combatPower), false),
                         items: item.item_equipment || [],
                         converted: (parseInt(combatPower) / 1000000).toFixed(1),
                         hexa: (parseInt(combatPower) / 850000).toFixed(1)
@@ -207,6 +206,16 @@
                 } finally {
                     setIsSearching(false);
                 }
+            };
+
+            const selectItemForSimulation = (item) => {
+                setItemLevel(Number(item.item_base_level));
+                setCurrentStars(Number(item.starforce));
+                setTotalCost(0);
+                setTotalBooms(0);
+                setTotalAttempts(0);
+                setLastResult({ type: '', msg: `[${item.item_name}] 강화 연동 완료` });
+                setActiveTab('simulator');
             };
 
             const StarRow = ({ start }) => (
@@ -259,7 +268,7 @@
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-orange-600 uppercase ml-1">시작 단계</label>
                                             <select className="w-full bg-white border border-orange-200 rounded-xl py-3 px-2 font-black text-sm outline-none shadow-sm" value={currentStars} onChange={(e) => setCurrentStars(Number(e.target.value))} disabled={totalAttempts > 0}>
-                                                {[...Array(30).keys()].map(s => <option key={s} value={s}>{s}성</option>)}
+                                                {[...Array(31).keys()].map(s => <option key={s} value={s}>{s}성</option>)}
                                             </select>
                                         </div>
                                         <div className="space-y-2">
@@ -384,25 +393,25 @@
                                 {searchResult && (
                                     <div className="w-full flex flex-col lg:flex-row gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-4">
                                         <div className="lg:w-1/3 flex flex-col gap-6">
-                                            <div className="bg-gray-900 rounded-[2.5rem] p-8 text-white flex flex-col items-center gap-6 shadow-2xl relative overflow-hidden">
+                                            <div className="bg-gray-900 rounded-[2.5rem] p-8 text-white flex flex-col items-center gap-6 shadow-2xl relative overflow-hidden text-center">
                                                 <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-                                                <img src={searchResult.basic.character_image} alt="Avatar" className="w-32 h-32 drop-shadow-[0_0_15px_rgba(255,140,0,0.3)]" />
-                                                <div className="text-center">
+                                                <img src={searchResult.basic.character_image} alt="Avatar" className="w-32 h-32 drop-shadow-[0_0_15px_rgba(255,140,0,0.3)] mx-auto" />
+                                                <div>
                                                     <span className="text-[10px] font-black bg-orange-500 px-2 py-0.5 rounded mr-2 uppercase">{searchResult.basic.world_name}</span>
                                                     <h3 className="text-2xl font-black mt-2">{searchResult.basic.character_name}</h3>
                                                     <p className="text-gray-500 text-xs font-bold mt-1 uppercase tracking-widest">Lv.{searchResult.basic.character_level} | {searchResult.basic.character_class}</p>
                                                 </div>
                                                 <div className="w-full space-y-3">
-                                                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex justify-between items-center">
-                                                        <span className="text-[10px] font-black text-gray-500 uppercase">전투력</span>
-                                                        <span className="text-lg font-black text-orange-500 tabular-nums">{searchResult.combatPower}</span>
+                                                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-center">
+                                                        <span className="text-[10px] font-black text-gray-500 uppercase mb-1">전투력</span>
+                                                        <span className="text-2xl font-black text-orange-500 tabular-nums italic">{searchResult.combatPower}</span>
                                                     </div>
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                                                    <div className="grid grid-cols-2 gap-3 text-center">
+                                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                                                             <p className="text-[9px] font-black text-gray-500 uppercase mb-1">환산</p>
                                                             <p className="font-black text-sm">{searchResult.converted}만</p>
                                                         </div>
-                                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                                                             <p className="text-[9px] font-black text-gray-500 uppercase mb-1">헥사환산</p>
                                                             <p className="font-black text-sm">{searchResult.hexa}만</p>
                                                         </div>
@@ -412,11 +421,12 @@
                                         </div>
                                         <div className="flex-1 flex flex-col gap-6">
                                             <div className="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
-                                                <h3 className="text-lg font-black mb-6 flex items-center gap-2 uppercase tracking-tighter italic">Equipment Grid</h3>
+                                                <h3 className="text-lg font-black mb-2 flex items-center gap-2 uppercase tracking-tighter italic">Equipment Grid</h3>
+                                                <p className="text-[10px] text-gray-400 font-bold mb-6 uppercase tracking-widest italic">Click an item to simulate enhancement</p>
                                                 <div className="equipment-grid">
                                                     {searchResult.items.map((item, idx) => (
-                                                        <div key={idx} className="group relative">
-                                                            <div className="w-full aspect-square bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center p-2 hover:border-orange-200 transition-all cursor-help overflow-hidden">
+                                                        <div key={idx} className="group relative" onClick={() => selectItemForSimulation(item)}>
+                                                            <div className="w-full aspect-square bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center p-2 hover:border-orange-500 hover:bg-orange-50 transition-all cursor-pointer overflow-hidden shadow-sm">
                                                                 <img src={item.item_icon} alt="item" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
                                                             </div>
                                                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 bg-gray-900 text-white text-[9px] p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-center shadow-xl">
