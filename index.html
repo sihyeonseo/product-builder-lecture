@@ -303,15 +303,27 @@
                         fetch(`https://open.api.nexon.com/maplestory/v1/character/item-equipment?ocid=${ocid}&date=${formattedDate}`, { headers: { "x-nxopen-api-key": API_KEY } }).then(r => r.json())
                     ]);
                     const cp = stat.final_stat?.find(s => s.stat_name === "전투력")?.stat_value || "0";
-                    setSearchResult({ basic, combatPower: formatKoreanCurrency(parseInt(cp), false), items: item.item_equipment || [], converted: (parseInt(cp)/1000000).toFixed(1), hexa: (parseInt(cp)/850000).toFixed(1) });
+                    setSearchResult({ basic, combatPower: formatKoreanCurrency(parseInt(cp), false), items: item.item_equipment || [] });
                 } catch (err) { alert(err.message); } finally { setIsSearching(false); }
             };
 
             const openItemModal = (item) => {
                 if (parseInt(item.starforce) === 0 && !item.item_name.includes("칠요")) { alert("강화가 불가능한 아이템입니다."); return; }
                 
+                const name = item.item_name;
                 const apiLevel = Number(item.item_base_level);
-                const detectedLevel = (apiLevel && apiLevel > 0) ? apiLevel : 160;
+                let detectedLevel = 160;
+
+                // 이름 기반 강력한 판별 로직 (API 데이터가 틀릴 경우를 대비해 최우선 적용)
+                if (name.includes('에테르넬')) detectedLevel = 250;
+                else if (name.includes('아케인쉐이드')) detectedLevel = 200;
+                else if (name.includes('앱솔랩스')) detectedLevel = 160;
+                else if (name.includes('파프니르') || name.includes('루타비스')) detectedLevel = 150;
+                else if (name.includes('도미네이터') || name.includes('마이스터') || name.includes('트와일라이트') || name.includes('데이브레이크')) detectedLevel = 140;
+                else if (name.includes('데아 시두스') || name.includes('실버블라썸') || name.includes('고귀한 이피아') || name.includes('블랙빈')) detectedLevel = 130;
+                else if (name.includes('파풀라투스 마크')) detectedLevel = 145;
+                else if (name.includes('태초의 정수') || name.includes('칠옥') || name.includes('거대한 공포') || name.includes('고통의 근원')) detectedLevel = 200;
+                else if (apiLevel && apiLevel > 0) detectedLevel = apiLevel; // 그 외의 경우에만 API 값 사용
 
                 setModalItem(item); setItemLevel(detectedLevel); setCurrentStars(Number(item.starforce)); 
                 setSpareCost('0'); spareCostRef.current = '0';
@@ -343,8 +355,42 @@
                                     <form onSubmit={handleCharSearch} className="w-full max-w-xl flex gap-3"><div className="flex-1 relative"><input type="text" placeholder="닉네임을 입력하세요" className="w-full bg-gray-50 border-2 border-transparent rounded-2xl py-4 px-6 pl-12 outline-none focus:border-orange-500 focus:bg-white transition-all font-black text-lg shadow-inner" value={charNickname} onChange={(e) => setCharNickname(e.target.value)} /><div className="absolute left-4 top-4.5 text-gray-400"><i data-lucide="search" class="w-5 h-5"></i></div></div><button type="submit" disabled={isSearching} className="bg-orange-50 text-white px-8 rounded-2xl font-black shadow-lg shadow-orange-100 hover:bg-orange-600 disabled:opacity-50 transition-all uppercase italic">{isSearching ? '...' : 'Search'}</button></form>
                                     {searchResult && (
                                         <div className="w-full flex flex-col lg:flex-row gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-4">
-                                            <div className="lg:w-1/3 flex flex-col gap-6 text-center"><div className="bg-gray-900 rounded-[2.5rem] p-8 text-white flex flex-col items-center gap-6 shadow-2xl relative overflow-hidden"><div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div><img src={searchResult.basic.character_image} alt="Avatar" className="w-32 h-32 drop-shadow-[0_0_15px_rgba(255,140,0,0.3)] mx-auto" /><div><span className="text-[10px] font-black bg-orange-500 text-white px-2 py-0.5 rounded mr-2 uppercase">{searchResult.basic.world_name}</span><h3 className="text-2xl font-black mt-2">{searchResult.basic.character_name}</h3><p className="text-gray-500 text-xs font-bold mt-1 uppercase tracking-widest">Lv.{searchResult.basic.character_level} | {searchResult.basic.character_class}</p></div><div className="w-full space-y-3"><div className="bg-white/5 border border-white/10 rounded-2xl p-4"><span className="text-[10px] font-black text-gray-500 uppercase mb-1 block text-xs">전투력</span><span className="text-2xl font-black text-orange-500 tabular-nums italic tracking-tighter">{searchResult.combatPower}</span></div><div className="grid grid-cols-2 gap-3 text-center"><div className="bg-white/5 border border-white/10 rounded-2xl p-4"><p className="text-[9px] font-black text-gray-500 uppercase mb-1">환산</p><p className="font-black text-sm">{searchResult.converted}만</p></div><div className="bg-white/5 border border-white/10 rounded-2xl p-4"><p className="text-[9px] font-black text-gray-500 uppercase mb-1">헥사환산</p><p className="font-black text-sm">{searchResult.hexa}만</p></div></div></div></div></div>
-                                            <div className="flex-1 flex flex-col gap-6"><div className="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm"><h3 className="text-lg font-black mb-2 flex items-center gap-2 uppercase tracking-tighter italic">Equipment Grid</h3><p className="text-[10px] text-gray-400 font-bold mb-6 uppercase tracking-widest italic">Click an item to open pop-up simulator</p><div className="equipment-grid">{searchResult.items.map((item, idx) => (<div key={idx} className="group relative" onClick={() => openItemModal(item)}><div className="w-full aspect-square bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center p-2 hover:border-orange-500 hover:bg-orange-50 transition-all cursor-pointer overflow-hidden shadow-sm"><img src={item.item_icon} alt="item" className="w-full h-full object-contain group-hover:scale-110 transition-transform" /></div><div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 bg-gray-900 text-white text-[9px] p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-center shadow-xl"><p className="font-black mb-1">{item.item_name}</p><p className="text-orange-500 font-bold">★ {item.starforce}</p></div></div>))}</div></div></div>
+                                            <div className="lg:w-1/3 flex flex-col gap-6 text-center">
+                                                <div className="bg-gray-900 rounded-[2.5rem] p-8 text-white flex flex-col items-center gap-6 shadow-2xl relative overflow-hidden">
+                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                                                    <img src={searchResult.basic.character_image} alt="Avatar" className="w-48 h-48 drop-shadow-[0_0_15px_rgba(255,140,0,0.3)] mx-auto" />
+                                                    <div>
+                                                        <span className="text-[10px] font-black bg-orange-500 text-white px-2 py-0.5 rounded mr-2 uppercase">{searchResult.basic.world_name}</span>
+                                                        <h3 className="text-2xl font-black mt-2">{searchResult.basic.character_name}</h3>
+                                                        <p className="text-gray-500 text-xs font-bold mt-1 uppercase tracking-widest">Lv.{searchResult.basic.character_level} | {searchResult.basic.character_class}</p>
+                                                    </div>
+                                                    <div className="w-full">
+                                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                                            <span className="text-[10px] font-black text-gray-500 uppercase mb-1 block text-xs">전투력</span>
+                                                            <span className="text-2xl font-black text-orange-500 tabular-nums italic tracking-tighter">{searchResult.combatPower}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 flex flex-col gap-6">
+                                                <div className="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
+                                                    <h3 className="text-lg font-black mb-2 flex items-center gap-2 uppercase tracking-tighter italic">Equipment Grid</h3>
+                                                    <p className="text-[10px] text-gray-400 font-bold mb-6 uppercase tracking-widest italic">Click an item to open pop-up simulator</p>
+                                                    <div className="equipment-grid">
+                                                        {searchResult.items.map((item, idx) => (
+                                                            <div key={idx} className="group relative" onClick={() => openItemModal(item)}>
+                                                                <div className="w-full aspect-square bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center p-2 hover:border-orange-500 hover:bg-orange-50 transition-all cursor-pointer overflow-hidden shadow-sm">
+                                                                    <img src={item.item_icon} alt="item" className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                                                                </div>
+                                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 bg-gray-900 text-white text-[9px] p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-center shadow-xl">
+                                                                    <p className="font-black mb-1">{item.item_name}</p>
+                                                                    <p className="text-orange-500 font-bold">★ {item.starforce}</p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
