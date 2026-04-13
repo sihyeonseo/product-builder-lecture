@@ -313,15 +313,19 @@
                 let detectedLevel = 160;
                 const name = item.item_name;
                 
-                // 1. API 데이터가 유효한 숫자인지 먼저 확인
-                if (item.item_base_level && Number(item.item_base_level) > 0) {
+                // 1. 확실한 고레벨 아이템 이름 기반 감지 (API 데이터보다 우선)
+                if (name.includes('에테르넬')) {
+                    detectedLevel = 250;
+                } else if (name.includes('아케인쉐이드')) {
+                    detectedLevel = 200;
+                } else if (name.includes('태초의 정수') || name.includes('칠옥') || name.includes('거대한 공포') || name.includes('고통의 근원') || name.includes('커맨더')) {
+                    detectedLevel = 200;
+                } else if (item.item_base_level && Number(item.item_base_level) > 0) {
+                    // 2. 그 외에는 API 데이터 활용
                     detectedLevel = Number(item.item_base_level);
-                } 
-                // 2. API 데이터가 없거나 0일 경우 정교한 이름 매핑 (Fallback)
-                else {
-                    if (name.includes('에테르넬')) detectedLevel = 250;
-                    else if (name.includes('아케인쉐이드')) detectedLevel = 200;
-                    else if (name.includes('앱솔랩스')) detectedLevel = 160;
+                } else {
+                    // 3. API 데이터도 없을 때의 Fallback
+                    if (name.includes('앱솔랩스')) detectedLevel = 160;
                     else if (name.includes('파프니르') || name.includes('루타비스')) detectedLevel = 150;
                     else if (name.includes('데아 시두스') || name.includes('실버블라썸') || name.includes('고귀한 이피아') || name.includes('블랙빈')) detectedLevel = 130;
                     else if (name.includes('도미네이터') || name.includes('마이스터') || name.includes('분노한 자쿰') || name.includes('트와일라이트') || name.includes('데이브레이크')) detectedLevel = 140;
@@ -329,7 +333,6 @@
                     else if (name.includes('파풀라투스 마크')) detectedLevel = 145;
                     else if (name.includes('지옥의 불꽃')) detectedLevel = 130;
                     else if (name.includes('핑크빈 마크')) detectedLevel = 135;
-                    else if (name.includes('태초의 정수') || name.includes('칠옥') || name.includes('거대한 공포') || name.includes('고통의 근원') || name.includes('커맨더')) detectedLevel = 200;
                 }
 
                 setModalItem(item); setItemLevel(detectedLevel); setCurrentStars(Number(item.starforce)); 
