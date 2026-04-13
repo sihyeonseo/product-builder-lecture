@@ -49,9 +49,11 @@
             if (!n || isNaN(n) || n === 0) return '0' + (showSuffix ? '메소' : '');
             const eok = Math.floor(n / 100000000);
             const man = Math.floor((n % 100000000) / 10000);
+            const remain = n % 10000;
             let res = '';
             if (eok > 0) res += `${eok}억 `;
-            if (man > 0) res += `${man}만`;
+            if (man > 0) res += `${man}만 `;
+            if (remain > 0) res += `${remain.toLocaleString()}`;
             return res.trim() + (showSuffix ? ' 메소' : '');
         };
 
@@ -291,7 +293,21 @@
 
             const openItemModal = (item) => {
                 if (parseInt(item.starforce) === 0 && !item.item_name.includes("칠요")) { alert("강화가 불가능한 아이템입니다."); return; }
-                setModalItem(item); setItemLevel(Number(item.item_base_level) || 160); setCurrentStars(Number(item.starforce)); 
+                
+                let detectedLevel = 160;
+                const name = item.item_name;
+                if (name.includes('에테르넬')) detectedLevel = 250;
+                else if (name.includes('아케인쉐이드')) detectedLevel = 200;
+                else if (name.includes('앱솔랩스')) detectedLevel = 160;
+                else if (name.includes('파프니르') || name.includes('루타비스')) detectedLevel = 150;
+                else if (name.includes('데아 시두스') || name.includes('실버블라썸') || name.includes('고귀한 이피아') || name.includes('블랙빈')) detectedLevel = 130;
+                else if (name.includes('도미네이터') || name.includes('마이스터') || name.includes('분노한 자쿰')) detectedLevel = 140;
+                else if (name.includes('태초의 정수') || name.includes('칠옥') || name.includes('거대한 공포') || name.includes('고통의 근원')) detectedLevel = 200;
+                else if (name.includes('마력이 깃든') || name.includes('루즈 컨트롤')) detectedLevel = 160;
+                
+                if (item.item_base_level && Number(item.item_base_level) > 0) detectedLevel = Number(item.item_base_level);
+
+                setModalItem(item); setItemLevel(detectedLevel); setCurrentStars(Number(item.starforce)); 
                 setSpareCost('0'); spareCostRef.current = '0';
                 resetAll(); setIsModalOpen(true);
             };
