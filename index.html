@@ -53,7 +53,7 @@
             let res = '';
             if (eok > 0) res += `${eok}억 `;
             if (man > 0) res += `${man}만 `;
-            if (remain > 0) res += `${remain.toLocaleString()}`;
+            if (remain > 0) res += `${remain}`;
             return res.trim() + (showSuffix ? ' 메소' : '');
         };
 
@@ -301,9 +301,12 @@
                 else if (name.includes('앱솔랩스')) detectedLevel = 160;
                 else if (name.includes('파프니르') || name.includes('루타비스')) detectedLevel = 150;
                 else if (name.includes('데아 시두스') || name.includes('실버블라썸') || name.includes('고귀한 이피아') || name.includes('블랙빈')) detectedLevel = 130;
-                else if (name.includes('도미네이터') || name.includes('마이스터') || name.includes('분노한 자쿰')) detectedLevel = 140;
-                else if (name.includes('태초의 정수') || name.includes('칠옥') || name.includes('거대한 공포') || name.includes('고통의 근원')) detectedLevel = 200;
-                else if (name.includes('마력이 깃든') || name.includes('루즈 컨트롤')) detectedLevel = 160;
+                else if (name.includes('도미네이터') || name.includes('마이스터') || name.includes('분노한 자쿰') || name.includes('트와일라이트') || name.includes('데이브레이크')) detectedLevel = 140;
+                else if (name.includes('가디언 엔젤') || name.includes('에스텔라') || name.includes('마력이 깃든') || name.includes('루즈 컨트롤')) detectedLevel = 160;
+                else if (name.includes('파풀라투스 마크')) detectedLevel = 145;
+                else if (name.includes('지옥의 불꽃')) detectedLevel = 130;
+                else if (name.includes('핑크빈 마크')) detectedLevel = 135;
+                else if (name.includes('태초의 정수') || name.includes('칠옥') || name.includes('거대한 공포') || name.includes('고통의 근원') || name.includes('커맨더')) detectedLevel = 200;
                 
                 if (item.item_base_level && Number(item.item_base_level) > 0) detectedLevel = Number(item.item_base_level);
 
